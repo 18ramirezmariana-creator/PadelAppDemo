@@ -83,6 +83,9 @@ def load_page(page_name):
             border-radius: 10px;
             margin-top: 40px;
         }
+                    
+        div[data-testid="column"] { padding: 0 30px !important; } 
+        section.main > div { padding-top: 30px; }            
         </style>
         """, unsafe_allow_html=True)
 
