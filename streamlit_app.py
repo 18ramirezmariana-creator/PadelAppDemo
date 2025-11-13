@@ -104,7 +104,7 @@ def load_page(page_name):
             elif mod == "Parejas Fijas":
                 allow_step = 2
         with c2:
-            num_players = st.number_input("Número de jugadores",value=8,key="select_players",step=allow_step)
+            num_players = st.number_input("Número de jugadores",value=8,key="select_players",step=allow_step,min_value=4)
             st.session_state.num_players = num_players
             pts = st.selectbox("Formato Puntaje", ["Sets","Puntos"],key="scoring",index=1)
             if pts == "Puntos":

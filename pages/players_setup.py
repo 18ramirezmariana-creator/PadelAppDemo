@@ -18,7 +18,6 @@ def app():
     # Asegurar que la lista 'players' tenga la longitud correcta
     if "players" not in st.session_state:
         st.session_state.players = [""]*num_cards
-        print("multiplicado por numero de cards:",num_cards)
     else:
         current_len = len(st.session_state.players)
         if current_len < num_cards:
@@ -99,14 +98,27 @@ def app():
 
     st.markdown("<div style='margin-top:180px;'></div>", unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns(4)
-    # === BOTÓN SIGUIENTE ===
+    # === BOTÓN ATRAS ===
     with col1:
         if st.button("Volver a Configuración", key="back_button"):
             st.session_state.page = "home"
             st.rerun()
 
-        # === BOTÓN ATRÁS ===
+        # === BOTÓN SIGUIENTE ===
     with col4:
-        if st.button("Empezar Torneo 🔥", key="next_button"):
+        players = [p.strip() for p in st.session_state.players if p.strip()]
+        duplicated = len(players) != len(set(players))
+        incomplete = len(players) < num_cards
+
+        if duplicated:
+            st.error("⚠️ Hay nombres repetidos. Corrige antes de continuar.")
+        elif incomplete:
+            st.warning("⚠️ Todos los nombres deben estar llenos.")
+
+        disabled = duplicated or incomplete
+        st.button("Empezar Torneo 🔥", key="next_button", disabled=disabled)
+        if not disabled and st.session_state.get("next_button"):
             st.session_state.page = "torneo"
             st.rerun()
+
+#TODO regla para que no se repitan nombres 
