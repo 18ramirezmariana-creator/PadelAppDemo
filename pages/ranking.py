@@ -4,8 +4,8 @@ from assets.helper_funcs import initialize_vars
 
 
 def app():
-    to_init = {"ranking":{}}
-    initialize_vars(to_init)
+    if "ranking" not in st.session_state:
+        st.session_state.ranking = {}
     rank = st.session_state.ranking
     # Convert to DataFrame
     df = rank.copy()
