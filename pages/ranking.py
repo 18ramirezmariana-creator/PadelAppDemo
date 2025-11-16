@@ -4,14 +4,26 @@ from assets.helper_funcs import initialize_vars
 
 
 def app():
-    if "ranking" not in st.session_state or not isinstance(st.session_state.ranking, pd.DataFrame) or st.session_state.ranking.empty:
+    # 1. Si no existe la clave, detener aquí
+    if "ranking" not in st.session_state:
         st.warning("Todavía no hay un ranking generado. Regresa al torneo para finalizar los partidos.")
         if st.button("Volver al Torneo"):
             st.session_state.page = "torneo"
             st.rerun()
         return
 
-    df = st.session_state.ranking.copy()
+    ranking_data = st.session_state["ranking"]
+
+    # 2. Validación del tipo
+    if not isinstance(ranking_data, pd.DataFrame) or ranking_data.empty:
+        st.warning("El ranking está vacío o tiene un formato inválido.")
+        if st.button("Volver al Torneo"):
+            st.session_state.page = "torneo"
+            st.rerun()
+        return
+
+    # 3. Si todo está bien
+    df = ranking_data.copy()
     # Display header
 
     # --- Estilos Podio ---
