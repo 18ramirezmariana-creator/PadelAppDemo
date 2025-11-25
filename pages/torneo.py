@@ -253,7 +253,8 @@ def app():
                     with colB:
                         score2 = st.number_input(f"Puntos {p2}", key=f"{p1}_{p2}_p2", min_value=0)
 
-                    st.session_state.resultados[(raw_p1, raw_p2)] = (score1, score2)
+                    st.session_state.resultados[(p1, p2)] = (score1, score2)
+
             
         # --- Ranking Final ---            
         if st.button("¿Cómo va el ranking? 👀"):
