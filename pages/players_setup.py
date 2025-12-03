@@ -118,6 +118,10 @@ def app():
         disabled = duplicated or incomplete
         st.button("Empezar Torneo 🔥", key="next_button", disabled=disabled)
         if not disabled and st.session_state.get("next_button"):
-            st.session_state.page = "torneo"
-            st.rerun()
+            if "num_sets" in st.session_state:
+                st.session_state.page = "torneo_sets"
+                st.rerun()
+            else:
+                st.session_state.page = "torneo"
+                st.rerun()
 

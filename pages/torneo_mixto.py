@@ -166,48 +166,7 @@ def app():
         
         st.markdown("---")
     
-    # Debug section (optional - can be removed in production)
-    with st.expander("🔍 Ver Datos de Depuración"):
-        st.write("**Resultados almacenados:**")
-        # Convert to displayable format
-        debug_results = {}
-        for key, value in st.session_state.resultados.items():
-            if isinstance(key, tuple):
-                debug_results[f"{key[0]} vs {key[1]}"] = f"{value[0]} - {value[1]}"
-            else:
-                debug_results[str(key)] = str(value)
-        st.json(debug_results)
-        st.write("**Número de partidos con resultados:**", len(st.session_state.resultados))
-        
-        # Show raw data
-        st.write("**Formato crudo para debugging:**")
-        for match, scores in st.session_state.resultados.items():
-            if isinstance(scores, tuple) and scores[0] > 0 or scores[1] > 0:
-                st.write(f"- {match[0]} vs {match[1]}: {scores[0]} - {scores[1]}")
-
-    # =========================================================
-    #      🔍 SECCIÓN: ANÁLISIS DE TORNEO MIXTO
-    # =========================================================
-    st.markdown("## 🔍 Análisis del Algoritmo (Mixto)")
-
-    mat_parejas, fig_parejas = heatmap_parejas_mixtas(
-    st.session_state.fixture,
-    st.session_state.hombres,
-    st.session_state.mujeres
-    )
-    st.pyplot(fig_parejas)
-    st.dataframe(mat_parejas)
-
-    players = st.session_state.hombres + st.session_state.mujeres
-    st.write("Descansos consecutivos por jugador:")
-
-    matrix_desc,fig_desc = heatmap_descansos_por_ronda(st.session_state.fixture,players)
-
-    st.pyplot(fig_desc)
-    st.dataframe(matrix_desc)
-    matrix2, fig2 = heatmap_enfrentamientos(st.session_state.fixture,players)
-    st.pyplot(fig2)
-    st.dataframe(matrix2)
+    
 
         
     # Show summary
@@ -228,7 +187,6 @@ def app():
                 
                 if ranking is not None and not ranking.empty:
                     st.session_state.ranking = ranking
-                    st.success("✅ Ranking calculado correctamente")
                     st.dataframe(ranking, use_container_width=True)
                 else:
                     st.warning("⚠️ No hay suficientes resultados para calcular el ranking")

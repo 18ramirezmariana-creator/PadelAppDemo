@@ -105,7 +105,6 @@ def load_page(page_name):
                     mixto = True
                 else:
                     mixto = False
-            #elif mod == "Parejas Fijas":
         with c2:
             num_players = st.number_input("Número de jugadores",
                                           key="select_players",step=1,min_value=8)
@@ -115,7 +114,13 @@ def load_page(page_name):
                 can_continue = False
             else:
                 can_continue = True
-            pts = st.selectbox("Formato Puntaje", ["Sets","Puntos"],key="scoring",index=1)
+            if st.session_state.mod == "Parejas Fijas":
+                pts = st.selectbox("Formato Puntaje", ["Sets","Puntos"],key="scoring",index=1)
+                if pts == "Sets":
+                    num_sets = st.number_input("Número de sets",value=6,key="num_sets_input")
+                    st.session_state.num_sets = num_sets
+            elif st.session_state.mod == "Todos Contra Todos":
+                pts = "Puntos"
             if pts == "Puntos":
                 num_pts = st.number_input("Número de puntos",value=16,key="num_point_input")
                 st.session_state.num_pts = num_pts
