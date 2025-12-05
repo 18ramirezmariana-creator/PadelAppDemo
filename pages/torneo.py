@@ -201,7 +201,7 @@ def app():
             st.dataframe(st.session_state.out["resumen"])
         
         # --- Ranking Final ---
-        if st.button("¿Cómo va el ranking? 👀"):
+        if st.button("¿Cómo va el ranking? 👀",use_container_width=True):
             ranking = calcular_ranking_individual(st.session_state.resultados, st.session_state.fixture)
             st.session_state.ranking = ranking
             st.dataframe(ranking)
