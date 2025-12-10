@@ -5,8 +5,24 @@ from assets.analyze_funcs import heatmap_parejas_mixtas,heatmap_descansos_por_ro
 from collections import defaultdict
 import random
 import pandas as pd
+
 def app():
-    st.title("Torneo Americano Mixto")
+    st.markdown('<div class="main-title"> Torneo Americano Mixto </div>', unsafe_allow_html=True)
+    
+    # -----------------------------------------------------
+    # 1. FUNCIÓN CALLBACK PARA GUARDAR RESULTADOS AL INSTANTE
+    # -----------------------------------------------------
+    def actualizar_resultado(pareja1_key, pareja2_key, pareja1_str, pareja2_str):
+        """Callback para guardar los puntos en st.session_state.resultados."""
+        try:
+            val1 = st.session_state[pareja1_key]
+            val2 = st.session_state[pareja2_key]
+            # La clave de resultados es un tuple de las parejas involucradas
+            st.session_state.resultados[(pareja1_str, pareja2_str)] = (val1, val2)
+        except KeyError:
+            # Esto puede ocurrir si se llama antes de que se hayan inicializado las keys, ignorar
+            pass
+    # -----------------------------------------------------
     
     # Initialize resultados if not exists
     if 'resultados' not in st.session_state:
@@ -36,12 +52,21 @@ def app():
                                         num_canchas, puntos_partido)
             st.session_state.fixture = out["rondas"]
             st.session_state.out = out
+            # NO BORRAMOS st.session_state.resultados aquí, sino solo si el torneo es nuevo.
+            # Al cambiar la llave del torneo, esto indica un torneo nuevo, así que lo borramos.
             st.session_state.resultados = {}
             st.session_state.tournament_key = tournament_key
 
     # Custom CSS
     st.markdown("""
         <style>
+        .main-title {
+        text-align: center;
+        font-size: 32px;
+        color: #6C13BF; /* Morado/Púrpura */
+        font-weight: 700;
+        margin-bottom: 40px;
+        }
         .match-card {
             background: linear-gradient(145deg, #ffffff, #f0f0f5);
             border-radius: 18px;
@@ -134,31 +159,53 @@ def app():
                     raw_p1 = "_".join(partido["pareja1"])
                     raw_p2 = "_".join(partido["pareja2"])
                     
+                    # Unique keys for the Streamlit widgets
                     key_p1 = f"score_r{ronda_data['ronda']}_m{c_i}_{raw_p1}_p1"
                     key_p2 = f"score_r{ronda_data['ronda']}_m{c_i}_{raw_p2}_p2"
                     
-                    # Create unique match key for storing results
+                    # Unique match key for storing results (uses rendered names)
                     pareja1_str = " & ".join(partido["pareja1"])
                     pareja2_str = " & ".join(partido["pareja2"])
                     
+                    # 2. RECUPERAR VALORES GUARDADOS
+                    # Usamos el valor por defecto 0, o el valor guardado
+                    saved_s1, saved_s2 = st.session_state.resultados.get((pareja1_str, pareja2_str), (0, 0))
+                    
                     colA, colB = st.columns(2)
                     with colA:
-                        score1 = st.number_input(
+                        st.number_input(
                             f"Puntos {pareja1}", 
                             key=key_p1, 
                             min_value=0,
-                            max_value=puntos_partido
+                            max_value=puntos_partido,
+                            value=saved_s1, # <-- Pasar el valor guardado
+                            on_change=actualizar_resultado, # <-- Usar callback
+                            kwargs={
+                                "pareja1_key": key_p1, 
+                                "pareja2_key": key_p2,
+                                "pareja1_str": pareja1_str, 
+                                "pareja2_str": pareja2_str
+                            }
                         )
                     with colB:
-                        score2 = st.number_input(
+                        st.number_input(
                             f"Puntos {pareja2}", 
                             key=key_p2, 
                             min_value=0,
-                            max_value=puntos_partido
+                            max_value=puntos_partido,
+                            value=saved_s2, # <-- Pasar el valor guardado
+                            on_change=actualizar_resultado, # <-- Usar callback
+                            kwargs={
+                                "pareja1_key": key_p1, 
+                                "pareja2_key": key_p2,
+                                "pareja1_str": pareja1_str, 
+                                "pareja2_str": pareja2_str
+                            }
                         )
                     
-                    # Store results immediately - tuple key for calcular_ranking_individual
-                    st.session_state.resultados[(pareja1_str, pareja2_str)] = (score1, score2)
+                    # 3. ELIMINAR ASIGNACIÓN INMEDIATA.
+                    # La asignación (st.session_state.resultados = (score1, score2)) ya no es necesaria
+                    # porque el callback la maneja.
         
         # Show resting players
         if ronda_data["descansan"]:
@@ -166,22 +213,20 @@ def app():
         
         st.markdown("---")
     
-    
-
-        
     # Show summary
     if "out" in st.session_state and "resumen" in st.session_state.out:
         st.markdown("### 📊 Resumen de Participación")
         df_resumen = pd.DataFrame(st.session_state.out["resumen"])
         st.dataframe(df_resumen, use_container_width=True)
     
-    analyze_algorithm_results(st.session_state.fixture,male_players, 
-        female_players)
+    #analyze_algorithm_results(st.session_state.fixture,male_players, 
+    #    female_players)
     
     # Ranking buttons
     st.markdown("---")
     col1, col2 = st.columns(2)
     
+    # El resto del código de navegación y ranking está bien y se mantiene igual.
     with col1:
         if st.button("👀 ¿Cómo va el ranking?", use_container_width=True):
             try:
@@ -217,14 +262,18 @@ def app():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col1:
         if st.button("⬅️ Volver", key="back_button", use_container_width=True):
-            # Clear tournament data when going back
+            # Clear tournament data when going back (esto es correcto)
             if 'tournament_key' in st.session_state:
                 del st.session_state.tournament_key
             if 'fixture' in st.session_state:
                 del st.session_state.fixture
             if 'out' in st.session_state:
                 del st.session_state.out
-            if 'resultados' in st.session_state:
-                del st.session_state.resultados
+            # Dejamos st.session_state.resultados para que se guarde el estado del fixture.
+            # OJO: Si borrabas st.session_state.resultados al volver, también perdías el estado.
+            # Lo que quieres es que no se borre al *volver desde el ranking*.
+            # Lo dejaré comentado, asumiendo que el usuario quiere borrar el fixture, pero no los resultados.
+            # if 'resultados' in st.session_state:
+            #     del st.session_state.resultados 
             st.session_state.page = "players_setupMixto"
             st.rerun()

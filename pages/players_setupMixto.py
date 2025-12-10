@@ -1,11 +1,44 @@
 import streamlit as st
 
+# -----------------------------------------------------
+# 1. FUNCIÓN CALLBACK PARA ACTUALIZAR EL NOMBRE AL INSTANTE
+# -----------------------------------------------------
+def update_player_name(gender, idx, key):
+    """
+    Callback para sincronizar el valor del widget (st.session_state[key])
+    con el elemento correspondiente en la lista maestra (st.session_state.hombres o st.session_state.mujeres).
+    """
+    # El valor actualizado por el usuario ya está en st.session_state[key]
+    
+    if gender == "hombres":
+        target_list = st.session_state.hombres
+    elif gender == "mujeres":
+        target_list = st.session_state.mujeres
+    else:
+        return # No hacer nada si el género no es válido
+
+    try:
+        # Lo asignamos a la lista maestra.
+        target_list[idx] = st.session_state[key]
+    except IndexError:
+        # En caso de que el índice sea incorrecto
+        pass
+
 def app():
     num_players = st.session_state.get("num_players")
+    # Asegúrate de que mod existe (aunque en esta página asumimos que es 'Mixto')
+    mod = st.session_state.get("mod", "Mixto")
+    
     # === TÍTULO ===
     st.markdown('<div class="main-title">🏅 Registro de Jugadores (Mixto)</div>', unsafe_allow_html=True)
 
-    n_hombres = n_mujeres = int(num_players/2)
+    # El número de jugadores debe ser par para Mixto.
+    if num_players is None or num_players % 2 != 0:
+         st.error("Error: El número de jugadores debe ser par para esta modalidad.")
+         # Opcional: Redirigir o establecer valores por defecto
+         n_hombres = n_mujeres = 0
+    else:
+        n_hombres = n_mujeres = int(num_players / 2)
 
     # === Inicializar listas en session_state ===
     if "hombres" not in st.session_state:
@@ -13,7 +46,7 @@ def app():
     if "mujeres" not in st.session_state:
         st.session_state.mujeres = [""] * n_mujeres
 
-    # Ajustar largo de listas al cambiar inputs
+    # Ajustar largo de listas al cambiar inputs (si num_players cambia)
     if len(st.session_state.hombres) != n_hombres:
         st.session_state.hombres = st.session_state.hombres[:n_hombres] + [""] * max(0, n_hombres - len(st.session_state.hombres))
 
@@ -34,33 +67,51 @@ def app():
 
     cols_per_row = 4
 
-    # === INPUTS HOMBRES ===
+    # === INPUTS HOMBRES (REFECTORIZADO) ===
     st.markdown("<div class='gender-title'>Hombres</div>", unsafe_allow_html=True)
     for i in range(0, n_hombres, cols_per_row):
         cols = st.columns(cols_per_row)
         for j, col in enumerate(cols):
             idx = i + j
             if idx < n_hombres:
+                player_key = f"hombre_{idx}"
                 with col:
-                    st.session_state.hombres[idx] = st.text_input(
+                    st.text_input(
                         f"Hombre {idx+1}",
                         value=st.session_state.hombres[idx],
-                        key=f"hombre_{idx}"
+                        key=player_key,
+                        # Usar callback para actualizar la lista de hombres
+                        on_change=update_player_name,
+                        kwargs={
+                            "gender": "hombres", 
+                            "idx": idx, 
+                            "key": player_key
+                        }
                     )
+                    # Eliminada la asignación directa
 
-    # === INPUTS MUJERES ===
+    # === INPUTS MUJERES (REFECTORIZADO) ===
     st.markdown("<div class='gender-title'>Mujeres</div>", unsafe_allow_html=True)
     for i in range(0, n_mujeres, cols_per_row):
         cols = st.columns(cols_per_row)
         for j, col in enumerate(cols):
             idx = i + j
             if idx < n_mujeres:
+                player_key = f"mujer_{idx}"
                 with col:
-                    st.session_state.mujeres[idx] = st.text_input(
+                    st.text_input(
                         f"Mujer {idx+1}",
                         value=st.session_state.mujeres[idx],
-                        key=f"mujer_{idx}"
+                        key=player_key,
+                        # Usar callback para actualizar la lista de mujeres
+                        on_change=update_player_name,
+                        kwargs={
+                            "gender": "mujeres", 
+                            "idx": idx, 
+                            "key": player_key
+                        }
                     )
+                    # Eliminada la asignación directa
 
     # ===== VALIDACIONES ROBUSTAS =====
     # Normalizar y filtrar vacíos
