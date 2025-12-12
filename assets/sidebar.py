@@ -16,5 +16,5 @@ def sidebar_style():
 
     logo = Image.open("assets/logo_playzone_purple.png")
     st.markdown(sidebar_bg, unsafe_allow_html=True)
-    with st.sidebar:
-        st.image(logo)
+    #with st.sidebar:
+    #    st.image(logo)
