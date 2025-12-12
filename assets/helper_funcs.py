@@ -34,14 +34,30 @@ def generar_fixture_parejas(parejas, num_canchas):
         rondas.append(ronda)
     return rondas
 
-def calcular_ranking_parejas(parejas:List[str], resultados:Dict[Tuple[str,str], Tuple[int,int]]) ->pd.DataFrame:
+def calcular_ranking_parejas(parejas: List[str], resultados: Dict[Tuple[str,str], Tuple[int,int]]) -> pd.DataFrame:
     """Calcula el ranking acumulado según los resultados ingresados."""
-    puntajes = {p: 0 for p in parejas}
+    
+    # 1. Uniformizar los nombres de las parejas al formato usado en el fixture (' & ')
+    # Si las parejas vienen como ['serg-mari', ...], se convierten a ['serg & mari', ...]
+    nombres_uniformes = [
+        p.replace("-", " & ") if "-" in p else p
+        for p in parejas
+    ]
+    
+    # 2. Inicializar el diccionario de puntajes con los nombres uniformes
+    puntajes = {p: 0 for p in nombres_uniformes}
+    
+    # 3. Calcular los puntajes (ahora las claves p1 y p2 coincidirán)
     for (p1, p2), (r1, r2) in resultados.items():
+        # Aquí, p1 y p2 ya están en el formato 'serg & mari', y la clave existe.
         puntajes[p1] += r1
         puntajes[p2] += r2
-    ranking = pd.DataFrame(sorted(puntajes.items(), key=lambda x: x[1], reverse=True),
-                           columns=["Jugador", "Puntos"])
+        
+    # 4. Generar el ranking
+    ranking = pd.DataFrame(
+        sorted(puntajes.items(), key=lambda x: x[1], reverse=True),
+        columns=["Jugador", "Puntos"]
+    )
     return ranking
 
 def calcular_ranking_individual(resultados: Dict[Tuple[str, str], Tuple[int, int]], 
