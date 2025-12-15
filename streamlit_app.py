@@ -24,30 +24,26 @@ def load_page(page_name):
         st.markdown("""
             <style>
             
-            /* Definición del color azul principal */
+            /* Definición de Variables de Color */
             :root {
-                --main-blue: #1061a0;
-                --main-white: white;
+                --color-titulo-principal: #6C13BF; /* Morado/Violeta - Usado para título, borde de resumen, texto de resumen fuerte. */
+                --color-fondo-input: #f7f7fb;     /* Gris muy claro/Blanquecino - Usado para fondo de campos de input y selectbox. */
+                --color-texto-labels-botones: #0B0B19; /* Negro muy oscuro - Usado para color de labels, texto de resumen normal, y fondo de botón. */
+                --color-fondo-resumen: #f0e6ff;   /* Lavanda muy claro - Usado para fondo del contenedor de resumen. */
+                --color-texto-input-botones: white; /* Blanco - Usado para texto/símbolos de botones de input (+/-) y texto de botón principal. */
             }
 
-            /* Aplicar color de fondo azul a toda la aplicación (si es posible en Streamlit) y texto blanco por defecto */
-            body, .stApp {
-                background-color: var(--main-blue) !important;
-                color: var(--main-white) !important;
-            }
-
-            /* === TÍTULO PRINCIPAL === */
             .main-title {
                 text-align: center;
                 font-size: 36px;
-                color: var(--main-white) !important; /* Letras blancas */
+                color: var(--color-titulo-principal); /* #6C13BF */
                 font-weight: 700;
                 margin-bottom: 50px;
             }
 
-            /* === ALTURA UNIFORME PARA TODOS LOS INPUTS (Fondo y Letras) === */
+            /* === ALTURA UNIFORME PARA TODOS LOS INPUTS === */
 
-            /* Number Input Container */
+            /* Number Input Container - Forzar altura total */
             .stNumberInput {
                 margin-bottom: 25px !important;
             }
@@ -58,7 +54,7 @@ def load_page(page_name):
                 align-items: center !important;
             }
 
-            /* Number Input - Campo de texto (Fondo azul, texto blanco) */
+            /* Number Input - Campo de texto */
             .stNumberInput input {
                 height: 52px !important;
                 min-height: 52px !important;
@@ -67,20 +63,17 @@ def load_page(page_name):
                 padding: 0 18px !important;
                 font-size: 20px !important;
                 border-radius: 10px !important;
-                background-color: var(--main-blue) !important; /* Fondo azul */
-                color: var(--main-white) !important; /* Texto blanco (puntajes) */
+                background-color: var(--color-fondo-input) !important; /* #f7f7fb */
                 line-height: 52px !important;
                 box-sizing: border-box !important;
             }
 
-            /* Number Input - Botones +/- (Fondo azul, texto blanco) */
+            /* Number Input - Botones +/- */
             .stNumberInput button {
                 height: 52px !important;
                 min-height: 52px !important;
                 max-height: 52px !important;
-                color: var(--main-white) !important;
-                background-color: var(--main-blue) !important; /* Asegura que el fondo sea azul si es un elemento separado */
-                border: 1px solid var(--main-white) !important; /* Borde blanco para separador */
+                color: var(--color-texto-input-botones) !important; /* white */
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -93,7 +86,7 @@ def load_page(page_name):
                 align-items: stretch !important;
             }
 
-            /* === SELECTBOX IGUALADOS (Fondo azul, texto blanco) === */
+            /* === SELECTBOX IGUALADOS === */
             .stSelectbox {
                 margin-bottom: 25px !important;
             }
@@ -111,29 +104,18 @@ def load_page(page_name):
                 padding: 0 18px !important;
                 font-size: 20px !important;
                 border-radius: 10px !important;
-                background-color: var(--main-blue) !important; /* Fondo azul */
-                color: var(--main-white) !important; /* Texto blanco */
+                background-color: var(--color-fondo-input) !important; /* #f7f7fb */
                 display: flex !important;
                 align-items: center !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
 
-            /* Opciones desplegables del Selectbox (ajuste adicional) */
-            div[data-baseweb="menu"] {
-                background-color: var(--main-blue) !important; /* Fondo azul del menú desplegable */
-                color: var(--main-white) !important; /* Texto blanco en las opciones */
-            }
-            
-            div[data-baseweb="menu"] li {
-                color: var(--main-white) !important; /* Texto blanco en los items del menú */
-            }
-
-            /* === LABELS MÁS GRANDES Y EN NEGRILLA (Letras blancas) === */
+            /* === LABELS MÁS GRANDES Y EN NEGRILLA === */
             label, .stSelectbox label, .stNumberInput label {
                 font-size: 24px !important;
                 font-weight: 700 !important;
-                color: var(--main-white) !important; /* Letras blancas */
+                color: var(--color-texto-labels-botones) !important; /* #0B0B19 */
                 margin-bottom: 6px !important;
             }
             
@@ -143,61 +125,41 @@ def load_page(page_name):
                 font-weight: 700 !important;
             }
 
-            /* === RESUMEN DEL TORNEO (Fondo azul, texto blanco) === */
+            /* === RESUMEN DEL TORNEO === */
             .tournament-summary {
-                background-color: var(--main-blue) !important; /* Fondo azul */
-                border-left: 4px solid var(--main-white) !important; /* Borde de contraste blanco */
+                background-color: var(--color-fondo-resumen); /* #f0e6ff */
+                border-left: 4px solid var(--color-titulo-principal); /* #6C13BF */
                 border-radius: 8px;
                 padding: 20px 25px;
                 margin: 35px 0 25px 0;
-                color: var(--main-white) !important; /* Texto blanco por si acaso */
             }
 
             .summary-text {
-                color: var(--main-white) !important; /* Texto blanco */
+                color: var(--color-texto-labels-botones); /* #0B0B19 */
                 font-size: 18px;
                 line-height: 1.6;
                 margin: 0;
             }
 
             .summary-text strong {
-                color: var(--main-white) !important; /* Texto blanco resaltado */
+                color: var(--color-titulo-principal); /* #6C13BF */
                 font-weight: 700;
             }
 
-            /* === BOTÓN (Fondo azul, texto blanco) === */
+            /* === BOTÓN === */
             .stButton button {
                 width: 100%;
-                background-color:black !important; /* Fondo azul */
-                color: var(--main-white) !important; /* Texto blanco */
+                background-color: var(--color-texto-labels-botones); /* #0B0B19 */
+                color: var(--color-texto-input-botones); /* white */
                 font-weight: 700;
                 font-size: 18px;
                 padding: 1em;
                 border-radius: 10px;
-                border: 2px solid var(--main-white) !important; /* Borde blanco para contraste */
                 margin-top: 20px;
             }
-            
-            /* Hover del botón */
-            .stButton button:hover {
-                background-color: var(--main-white) !important; /* Fondo blanco al pasar el ratón */
-                color: var(--main-blue) !important; /* Texto azul al pasar el ratón */
-            }
 
-            /* === AJUSTES DE STREAMLIT === */
             div[data-testid="column"] { padding: 0 30px !important; } 
             section.main > div { padding-top: 30px; }
-            
-            /* Para el contenedor principal de Streamlit y barra lateral */
-            .stSidebar, section.main {
-                background-color: var(--main-blue) !important;
-            }
-            
-            /* Texto genérico en toda la app */
-            .stMarkdown, .stText, .stAlert, p, h1, h2, h3, h4, h5, h6 {
-                color: var(--main-white) !important;
-            }
-
             </style>
     """, unsafe_allow_html=True)
 
