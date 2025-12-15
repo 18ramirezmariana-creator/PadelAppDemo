@@ -26,7 +26,7 @@ def load_page(page_name):
         .main-title {
             text-align: center;
             font-size: 36px;
-            color: #f04a10;
+            color: #1061a0;
             font-weight: 700;
             margin-bottom: 50px;
         }
@@ -94,7 +94,7 @@ def load_page(page_name):
             padding: 0 18px !important;
             font-size: 20px !important;
             border-radius: 10px !important;
-            background-color: #f7f7fb !important;
+            background-color: #1061a0 !important;
             display: flex !important;
             align-items: center !important;
             width: 100% !important;
@@ -105,7 +105,7 @@ def load_page(page_name):
         label, .stSelectbox label, .stNumberInput label {
             font-size: 24px !important;
             font-weight: 700 !important;
-            color: #0B0B19 !important;
+            color: #1061a0 !important;
             margin-bottom: 6px !important;
         }
         
