@@ -22,139 +22,187 @@ def load_page(page_name):
     if page_name == "home":
 
         st.markdown("""
-        <style>
-        .main-title {
-            text-align: center;
-            font-size: 36px;
-            color: #1061a0;
-            font-weight: 700;
-            margin-bottom: 50px;
-        }
+            <style>
+            
+            /* Definición del color azul principal */
+            :root {
+                --main-blue: #1061a0;
+                --main-white: white;
+            }
 
-        /* === ALTURA UNIFORME PARA TODOS LOS INPUTS === */
+            /* Aplicar color de fondo azul a toda la aplicación (si es posible en Streamlit) y texto blanco por defecto */
+            body, .stApp {
+                background-color: var(--main-blue) !important;
+                color: var(--main-white) !important;
+            }
 
-        /* Number Input Container - Forzar altura total */
-        .stNumberInput {
-            margin-bottom: 25px !important;
-        }
+            /* === TÍTULO PRINCIPAL === */
+            .main-title {
+                text-align: center;
+                font-size: 36px;
+                color: var(--main-white) !important; /* Letras blancas */
+                font-weight: 700;
+                margin-bottom: 50px;
+            }
 
-        .stNumberInput > div {
-            height: 52px !important;
-            display: flex !important;
-            align-items: center !important;
-        }
+            /* === ALTURA UNIFORME PARA TODOS LOS INPUTS (Fondo y Letras) === */
 
-        /* Number Input - Campo de texto */
-        .stNumberInput input {
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
-            width: 100% !important;
-            padding: 0 18px !important;
-            font-size: 20px !important;
-            border-radius: 10px !important;
-            background-color: #f7f7fb !important;
-            line-height: 52px !important;
-            box-sizing: border-box !important;
-        }
+            /* Number Input Container */
+            .stNumberInput {
+                margin-bottom: 25px !important;
+            }
 
-        /* Number Input - Botones +/- */
-        .stNumberInput button {
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
-            color: white !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
+            .stNumberInput > div {
+                height: 52px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
 
-        /* Contenedor de los botones */
-        .stNumberInput > div > div {
-            height: 52px !important;
-            display: flex !important;
-            align-items: stretch !important;
-        }
+            /* Number Input - Campo de texto (Fondo azul, texto blanco) */
+            .stNumberInput input {
+                height: 52px !important;
+                min-height: 52px !important;
+                max-height: 52px !important;
+                width: 100% !important;
+                padding: 0 18px !important;
+                font-size: 20px !important;
+                border-radius: 10px !important;
+                background-color: var(--main-blue) !important; /* Fondo azul */
+                color: var(--main-white) !important; /* Texto blanco (puntajes) */
+                line-height: 52px !important;
+                box-sizing: border-box !important;
+            }
 
-        /* === SELECTBOX IGUALADOS === */
-        .stSelectbox {
-            margin-bottom: 25px !important;
-        }
+            /* Number Input - Botones +/- (Fondo azul, texto blanco) */
+            .stNumberInput button {
+                height: 52px !important;
+                min-height: 52px !important;
+                max-height: 52px !important;
+                color: var(--main-white) !important;
+                background-color: var(--main-blue) !important; /* Asegura que el fondo sea azul si es un elemento separado */
+                border: 1px solid var(--main-white) !important; /* Borde blanco para separador */
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
 
-        div[data-baseweb="select"] {
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
-        }
+            /* Contenedor de los botones */
+            .stNumberInput > div > div {
+                height: 52px !important;
+                display: flex !important;
+                align-items: stretch !important;
+            }
 
-        div[data-baseweb="select"] > div {
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
-            padding: 0 18px !important;
-            font-size: 20px !important;
-            border-radius: 10px !important;
-            background-color: #1061a0 !important;
-            display: flex !important;
-            align-items: center !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
+            /* === SELECTBOX IGUALADOS (Fondo azul, texto blanco) === */
+            .stSelectbox {
+                margin-bottom: 25px !important;
+            }
 
-        /* === LABELS MÁS GRANDES Y EN NEGRILLA === */
-        label, .stSelectbox label, .stNumberInput label {
-            font-size: 24px !important;
-            font-weight: 700 !important;
-            color: #1061a0 !important;
-            margin-bottom: 6px !important;
-        }
-        
-        /* Forzar negrilla en todos los labels */
-        div[data-testid="stNumberInput"] label,
-        div[data-testid="stSelectbox"] label {
-            font-weight: 700 !important;
-        }
+            div[data-baseweb="select"] {
+                height: 52px !important;
+                min-height: 52px !important;
+                max-height: 52px !important;
+            }
 
-        /* === RESUMEN DEL TORNEO === */
-        .tournament-summary {
-            background-color: #f0e6ff;
-            border-left: 4px solid #6C13BF;
-            border-radius: 8px;
-            padding: 20px 25px;
-            margin: 35px 0 25px 0;
-        }
+            div[data-baseweb="select"] > div {
+                height: 52px !important;
+                min-height: 52px !important;
+                max-height: 52px !important;
+                padding: 0 18px !important;
+                font-size: 20px !important;
+                border-radius: 10px !important;
+                background-color: var(--main-blue) !important; /* Fondo azul */
+                color: var(--main-white) !important; /* Texto blanco */
+                display: flex !important;
+                align-items: center !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
 
-        .summary-text {
-            color: #0B0B19;
-            font-size: 18px;
-            line-height: 1.6;
-            margin: 0;
-        }
+            /* Opciones desplegables del Selectbox (ajuste adicional) */
+            div[data-baseweb="menu"] {
+                background-color: var(--main-blue) !important; /* Fondo azul del menú desplegable */
+                color: var(--main-white) !important; /* Texto blanco en las opciones */
+            }
+            
+            div[data-baseweb="menu"] li {
+                color: var(--main-white) !important; /* Texto blanco en los items del menú */
+            }
 
-        .summary-text strong {
-            color: #6C13BF;
-            font-weight: 700;
-        }
+            /* === LABELS MÁS GRANDES Y EN NEGRILLA (Letras blancas) === */
+            label, .stSelectbox label, .stNumberInput label {
+                font-size: 24px !important;
+                font-weight: 700 !important;
+                color: var(--main-white) !important; /* Letras blancas */
+                margin-bottom: 6px !important;
+            }
+            
+            /* Forzar negrilla en todos los labels */
+            div[data-testid="stNumberInput"] label,
+            div[data-testid="stSelectbox"] label {
+                font-weight: 700 !important;
+            }
 
-        /* === BOTÓN === */
-        .stButton button {
-            width: 100%;
-            background-color: #0B0B19;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            padding: 1em;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+            /* === RESUMEN DEL TORNEO (Fondo azul, texto blanco) === */
+            .tournament-summary {
+                background-color: var(--main-blue) !important; /* Fondo azul */
+                border-left: 4px solid var(--main-white) !important; /* Borde de contraste blanco */
+                border-radius: 8px;
+                padding: 20px 25px;
+                margin: 35px 0 25px 0;
+                color: var(--main-white) !important; /* Texto blanco por si acaso */
+            }
 
-        div[data-testid="column"] { padding: 0 30px !important; } 
-        section.main > div { padding-top: 30px; }
-        </style>
-""", unsafe_allow_html=True)
+            .summary-text {
+                color: var(--main-white) !important; /* Texto blanco */
+                font-size: 18px;
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            .summary-text strong {
+                color: var(--main-white) !important; /* Texto blanco resaltado */
+                font-weight: 700;
+            }
+
+            /* === BOTÓN (Fondo azul, texto blanco) === */
+            .stButton button {
+                width: 100%;
+                background-color:black !important; /* Fondo azul */
+                color: var(--main-white) !important; /* Texto blanco */
+                font-weight: 700;
+                font-size: 18px;
+                padding: 1em;
+                border-radius: 10px;
+                border: 2px solid var(--main-white) !important; /* Borde blanco para contraste */
+                margin-top: 20px;
+            }
+            
+            /* Hover del botón */
+            .stButton button:hover {
+                background-color: var(--main-white) !important; /* Fondo blanco al pasar el ratón */
+                color: var(--main-blue) !important; /* Texto azul al pasar el ratón */
+            }
+
+            /* === AJUSTES DE STREAMLIT === */
+            div[data-testid="column"] { padding: 0 30px !important; } 
+            section.main > div { padding-top: 30px; }
+            
+            /* Para el contenedor principal de Streamlit y barra lateral */
+            .stSidebar, section.main {
+                background-color: var(--main-blue) !important;
+            }
+            
+            /* Texto genérico en toda la app */
+            .stMarkdown, .stText, .stAlert, p, h1, h2, h3, h4, h5, h6 {
+                color: var(--main-white) !important;
+            }
+
+            </style>
+    """, unsafe_allow_html=True)
 
         # Título centrado
-        st.markdown('<div class="main-title">🏆 PlayZone Padel App</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title">🏆 Padel App</div>', unsafe_allow_html=True)
 
         c1,c2 = st.columns(2)
         mixto = False
