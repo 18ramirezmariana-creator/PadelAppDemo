@@ -133,7 +133,16 @@ def app():
                     # NOTA CLAVE: Ya no se usa la asignación directa: st.session_state.players[idx] = st.text_input(...)
 
     st.markdown("<div style='margin-top:180px;'></div>", unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns(4)
+    players = [p.strip() for p in st.session_state.players if p.strip()]
+    duplicated = len(players) != len(set(players))
+    incomplete = len(players) < num_cards
+
+    if duplicated:
+        st.error("⚠️ Hay nombres repetidos. Corrige antes de continuar.")
+    elif incomplete:
+        st.warning("⚠️ Todos los nombres deben estar llenos.")
+
+    col1, col2 = st.columns(2)
     # === BOTÓN ATRAS ===
     with col1:
         if st.button("Volver a Configuración", key="back_button"):
@@ -141,16 +150,7 @@ def app():
             st.rerun()
 
         # === BOTÓN SIGUIENTE ===
-    with col4:
-        players = [p.strip() for p in st.session_state.players if p.strip()]
-        duplicated = len(players) != len(set(players))
-        incomplete = len(players) < num_cards
-
-        if duplicated:
-            st.error("⚠️ Hay nombres repetidos. Corrige antes de continuar.")
-        elif incomplete:
-            st.warning("⚠️ Todos los nombres deben estar llenos.")
-
+    with col2:
         disabled = duplicated or incomplete
         
         # Streamlit ejecuta el botón y luego la lógica condicional

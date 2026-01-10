@@ -62,6 +62,28 @@ def app():
             margin-bottom: 25px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.07);
         }
+
+        .stNumberInput input {
+            background-color: #5E3187 !important; /* Fondo Morado */
+            color: white !important;               /* NÚMERO BLANCO (Diferente al fondo) */
+            font-weight: 700 !important;
+            border-radius: 8px !important;
+            border: none !important;
+        }
+
+        /* 2. LOS BOTONES DE + Y - DEL NUMBER INPUT */
+        .stNumberInput button {
+            background-color: #5E3187 !important; /* Fondo Morado */
+            color: white !important;               /* SIGNOS BLANCOS (Diferente al fondo) */
+            border: none !important;
+        }
+
+        /* 3. EFECTO AL PASAR EL MOUSE POR LOS BOTONES +/- */
+        .stNumberInput button:hover {
+            background-color: #6C13BF !important; /* Un morado más claro al tocarlo */
+            color: #00CED1 !important;           /* Signos cambian a Turquesa */
+        }       
+
         .final-match-card {
             background-color: #5E3187; 
             color: white;

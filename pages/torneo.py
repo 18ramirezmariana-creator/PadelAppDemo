@@ -51,11 +51,13 @@ def app():
                 margin-bottom: 40px;
                 }
                 .match-card {
-                    background-color: #f7f7fb;
-                    border-radius: 15px;
-                    padding: 20px;
+                    background: linear-gradient(145deg, #ffffff, #f0f0f5);
+                    border-radius: 18px;
+                    padding: 22px;
                     margin-bottom: 25px;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                    border: 1px solid rgba(108, 19, 191, 0.1);
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
                 }
                 .match-title {
                     font-weight: 700;
@@ -350,7 +352,7 @@ def app():
             
 
     # --- Navegación inferior ---
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     with col1:
         if st.button("Volver y Reiniciar", key="back_button"):
             # Limpiar datos del torneo al volver
@@ -362,7 +364,7 @@ def app():
                 del st.session_state.resultados
             st.session_state.page = "players_setup"
             st.rerun()
-    with col4:
+    with col2:
         if st.button("Ver Resultados Finales 🏆"):
             if mod_parejas == "Parejas Fijas":
                 ranking = calcular_ranking_parejas(st.session_state.parejas, st.session_state.resultados)
