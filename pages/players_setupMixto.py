@@ -147,16 +147,16 @@ def app():
 
     st.markdown("<div style='margin-top: 80px;'></div>", unsafe_allow_html=True)
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col4 = st.columns(2)
 
     with col1:
-        if st.button("Volver a Configuración"):
+        if st.button("Volver a Configuración",use_container_width=True):
             st.session_state.page = "home"
             st.rerun()
 
     with col4:
         # Manejar la acción directamente al hacer click
-        if st.button("Empezar Torneo 🔥", disabled=continuar_disabled):
+        if st.button("Empezar Torneo 🔥", disabled=continuar_disabled,use_container_width=True):
             # doble comprobación antes de avanzar
             if not continuar_disabled:
                 st.session_state.page = "torneo_mixto"

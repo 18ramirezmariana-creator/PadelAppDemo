@@ -145,7 +145,7 @@ def app():
     col1, col2 = st.columns(2)
     # === BOTÓN ATRAS ===
     with col1:
-        if st.button("Volver a Configuración", key="back_button"):
+        if st.button("Volver a Configuración", key="back_button", use_container_width=True):
             st.session_state.page = "home"
             st.rerun()
 
@@ -154,7 +154,7 @@ def app():
         disabled = duplicated or incomplete
         
         # Streamlit ejecuta el botón y luego la lógica condicional
-        if st.button("Empezar Torneo 🔥", key="next_button", disabled=disabled):
+        if st.button("Empezar Torneo 🔥", key="next_button", disabled=disabled, use_container_width=True):
             if "num_sets" in st.session_state:
                 st.session_state.page = "torneo_sets"
                 st.rerun()
