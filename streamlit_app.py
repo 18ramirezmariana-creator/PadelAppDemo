@@ -4,9 +4,6 @@ import os,importlib
 from assets.sidebar import sidebar_style
 from assets.helper_funcs import initialize_vars
 st.set_page_config(page_title=" Padel App",page_icon=":tennis:", layout="wide")
-if not check_login():
-    st.stop()
-
 hide_streamlit_style = """
     <style>
     #MainMenu {visibility: hidden;}
@@ -15,6 +12,8 @@ hide_streamlit_style = """
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+if not check_login():
+    st.stop()
 
 # Cargar la lista de páginas desde la carpeta "pages"
 pages_list = ["home"] + [f.replace(".py", "") for f in os.listdir("pages") if f.endswith(".py")]
