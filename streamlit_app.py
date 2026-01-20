@@ -1,8 +1,11 @@
 import streamlit as st
+from assets.auth import check_login
 import os,importlib
 from assets.sidebar import sidebar_style
 from assets.helper_funcs import initialize_vars
 st.set_page_config(page_title=" Padel App",page_icon=":tennis:", layout="wide")
+if not check_login():
+    st.stop()
 
 hide_streamlit_style = """
     <style>
