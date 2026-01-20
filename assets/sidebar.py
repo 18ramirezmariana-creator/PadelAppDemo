@@ -20,6 +20,3 @@ def sidebar_style():
     with st.sidebar:
         st.image(logo)
         st.image(watermark)
-        if st.button("Cerrar sesión"):
-            st.session_state.clear()
-            st.rerun()
