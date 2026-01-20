@@ -1,9 +1,33 @@
 import streamlit as st
 import bcrypt
 
+def inject_login_css():
+    st.markdown(
+        """
+        <style>
+        /* Input fields */
+        input[type="text"], input[type="password"] {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+
+        /* Placeholder */
+        input::placeholder {
+            color: #888888 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 def check_login():
     if st.session_state.get("authenticated"):
         return True
+    inject_login_css()
 
     st.title("Acceso restringido")
 
