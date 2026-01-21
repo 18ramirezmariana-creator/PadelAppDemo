@@ -2,6 +2,7 @@ import streamlit as st
 from assets.auth import check_login
 import os,importlib
 from assets.sidebar import sidebar_style
+from assets.styles import apply_custom_css_main, apply_custom_css_player_setup, DEMO_THEME
 from assets.helper_funcs import initialize_vars
 st.set_page_config(page_title=" Padel App",page_icon=":tennis:", layout="wide")
 hide_streamlit_style = """
@@ -12,8 +13,8 @@ hide_streamlit_style = """
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-if not check_login():
-    st.stop()
+#if not check_login():
+#    st.stop()
 
 # Cargar la lista de páginas desde la carpeta "pages"
 pages_list = ["home"] + [f.replace(".py", "") for f in os.listdir("pages") if f.endswith(".py")]
@@ -23,150 +24,9 @@ if "page" not in st.session_state:
 def load_page(page_name):
     if page_name == "home":
 
-        st.markdown("""
-            <style>
-            
-            /* Definición de Variables de Color */
-            :root {
-                --color-titulo-principal: #6C13BF; /* Morado/Violeta - Usado para título, borde de resumen, texto de resumen fuerte. */
-                --color-fondo-input: #f7f7fb;     /* Gris muy claro/Blanquecino - Usado para fondo de campos de input y selectbox. */
-                --color-texto-labels-botones: #0B0B19; /* Negro muy oscuro - Usado para color de labels, texto de resumen normal, y fondo de botón. */
-                --color-fondo-resumen: #f0e6ff;   /* Lavanda muy claro - Usado para fondo del contenedor de resumen. */
-                --color-texto-input-botones: white; /* Blanco - Usado para texto/símbolos de botones de input (+/-) y texto de botón principal. */
-            }
-
-            .main-title {
-                text-align: center;
-                font-size: 36px;
-                color: var(--color-titulo-principal); /* #6C13BF */
-                font-weight: 700;
-                margin-bottom: 50px;
-            }
-
-            /* === ALTURA UNIFORME PARA TODOS LOS INPUTS === */
-
-            /* Number Input Container - Forzar altura total */
-            .stNumberInput {
-                margin-bottom: 25px !important;
-            }
-
-            .stNumberInput > div {
-                height: 52px !important;
-                display: flex !important;
-                align-items: center !important;
-            }
-
-            /* Number Input - Campo de texto */
-            .stNumberInput input {
-                height: 52px !important;
-                min-height: 52px !important;
-                max-height: 52px !important;
-                width: 100% !important;
-                padding: 0 18px !important;
-                font-size: 20px !important;
-                border-radius: 10px !important;
-                background-color: var(--color-fondo-input) !important; /* #f7f7fb */
-                line-height: 52px !important;
-                box-sizing: border-box !important;
-            }
-
-            /* Number Input - Botones +/- */
-            .stNumberInput button {
-                height: 52px !important;
-                min-height: 52px !important;
-                max-height: 52px !important;
-                color: var(--color-texto-input-botones) !important; /* white */
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-
-            /* Contenedor de los botones */
-            .stNumberInput > div > div {
-                height: 52px !important;
-                display: flex !important;
-                align-items: stretch !important;
-            }
-
-            /* === SELECTBOX IGUALADOS === */
-            .stSelectbox {
-                margin-bottom: 25px !important;
-            }
-
-            div[data-baseweb="select"] {
-                height: 52px !important;
-                min-height: 52px !important;
-                max-height: 52px !important;
-            }
-
-            div[data-baseweb="select"] > div {
-                height: 52px !important;
-                min-height: 52px !important;
-                max-height: 52px !important;
-                padding: 0 18px !important;
-                font-size: 20px !important;
-                border-radius: 10px !important;
-                background-color: var(--color-fondo-input) !important; /* #f7f7fb */
-                display: flex !important;
-                align-items: center !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-            }
-
-            /* === LABELS MÁS GRANDES Y EN NEGRILLA === */
-            label, .stSelectbox label, .stNumberInput label {
-                font-size: 24px !important;
-                font-weight: 700 !important;
-                color: var(--color-texto-labels-botones) !important; /* #0B0B19 */
-                margin-bottom: 6px !important;
-            }
-            
-            /* Forzar negrilla en todos los labels */
-            div[data-testid="stNumberInput"] label,
-            div[data-testid="stSelectbox"] label {
-                font-weight: 700 !important;
-            }
-
-            /* === RESUMEN DEL TORNEO === */
-            .tournament-summary {
-                background-color: var(--color-fondo-resumen); /* #f0e6ff */
-                border-left: 4px solid var(--color-titulo-principal); /* #6C13BF */
-                border-radius: 8px;
-                padding: 20px 25px;
-                margin: 35px 0 25px 0;
-            }
-
-            .summary-text {
-                color: var(--color-texto-labels-botones); /* #0B0B19 */
-                font-size: 18px;
-                line-height: 1.6;
-                margin: 0;
-            }
-
-            .summary-text strong {
-                color: var(--color-titulo-principal); /* #6C13BF */
-                font-weight: 700;
-            }
-
-            /* === BOTÓN === */
-            .stButton button {
-                width: 100%;
-                background-color: var(--color-texto-labels-botones); /* #0B0B19 */
-                color: var(--color-texto-input-botones); /* white */
-                font-weight: 700;
-                font-size: 18px;
-                padding: 1em;
-                border-radius: 10px;
-                margin-top: 20px;
-            }
-
-            div[data-testid="column"] { padding: 0 30px !important; } 
-            section.main > div { padding-top: 30px; }
-            </style>
-    """, unsafe_allow_html=True)
-
+        apply_custom_css_main(DEMO_THEME)
         # Título centrado
-        st.markdown('<div class="main-title">🏆 Padel App</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title">🏆 Tu Padel App</div>', unsafe_allow_html=True)
 
         c1,c2 = st.columns(2)
         mixto = False

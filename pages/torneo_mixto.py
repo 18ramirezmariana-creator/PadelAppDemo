@@ -1,5 +1,6 @@
 import streamlit as st
 from models.AmericanoMixto.AllvsAll_MixtoV2 import AmericanoPadelTournament, generar_torneo_mixto,analyze_algorithm_results
+from assets.styles import apply_custom_css_torneo_mixto, DEMO_THEME
 from assets.helper_funcs import initialize_vars, calcular_ranking_individual, render_nombre
 from assets.analyze_funcs import heatmap_parejas_mixtas,heatmap_descansos_por_ronda, heatmap_enfrentamientos
 from collections import defaultdict
@@ -58,70 +59,7 @@ def app():
             st.session_state.tournament_key = tournament_key
 
     # Custom CSS
-    st.markdown("""
-        <style>
-        .main-title {
-        text-align: center;
-        font-size: 32px;
-        color: #6C13BF; /* Morado/Púrpura */
-        font-weight: 700;
-        margin-bottom: 40px;
-        }
-        .match-card {
-            background: linear-gradient(145deg, #ffffff, #f0f0f5);
-            border-radius: 18px;
-            padding: 22px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            border: 1px solid rgba(108, 19, 191, 0.1);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .match-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
-        }
-        .match-title {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0B0B19;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .team-name {
-            font-weight: 600;
-            color: #0B0B19;
-            font-size: 16px;
-            text-align: center;
-            padding: 8px;
-        }
-        .vs {
-            font-weight: 800;
-            font-size: 20px;
-            color: #6C13BF;
-            text-align: center;
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-        .stNumberInput input {
-            background-color: #5E3187 !important;
-            color: white !important;
-            font-weight: 700 !important;
-        }
-        .stNumberInput button {
-            color: white !important;
-        }
-        .stButton button {
-            width: 100%;
-            background-color: #0B0B19;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            padding: 1em;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    apply_custom_css_torneo_mixto(DEMO_THEME)
 
     # Display each round
     for ronda_data in st.session_state.fixture:

@@ -1,6 +1,7 @@
 import streamlit as st
 from assets.helper_funcs import  calcular_ranking_parejas,initialize_vars, calcular_ranking_individual,render_nombre
 from models.AmericanoParejas.AmericanoParejasv1 import FixedPairsTournament
+from assets.styles import DEMO_THEME,apply_custom_css_torneo
 from assets.analyze_funcs import analyze_algorithm_results
 from models.AllvsAll_Random_modelv3 import AmericanoTournament
 import pandas as pd
@@ -41,67 +42,7 @@ def app():
                 st.session_state.parejas = parejas
                 st.session_state.tournament_key = tournament_key
         if st.session_state.code_play == "parejas_fijas" :
-            st.markdown("""
-                <style>
-                .main-title {
-                text-align: center;
-                font-size: 32px;
-                color: #6C13BF; /* Morado/Púrpura */
-                font-weight: 700;
-                margin-bottom: 40px;
-                }
-                .match-card {
-                    background: linear-gradient(145deg, #ffffff, #f0f0f5);
-                    border-radius: 18px;
-                    padding: 22px;
-                    margin-bottom: 25px;
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-                    border: 1px solid rgba(108, 19, 191, 0.1);
-                    transition: transform 0.15s ease, box-shadow 0.15s ease;
-                }
-                .match-title {
-                    font-weight: 700;
-                    font-size: 18px;
-                    color: #0B0B19;
-                    margin-bottom: 10px;
-                }
-                .team-name {
-                    font-weight: 600;
-                    color: #0B0B19;
-                    font-size: 16px;
-                    text-align: center;
-                }
-                .vs {
-                    font-weight: 800;
-                    font-size: 20px;
-                    color: #6C13BF;
-                    text-align: center;
-                    margin-top: 8px;
-                    margin-bottom: 8px;
-                }
-                
-                .stNumberInput input {
-                background-color: #5E3187 !important;
-                color: white !important;                 /* makes the number white */
-                font-weight: 700 !important;             /* makes it bold */
-                }
-                        
-                .stNumberInput button {
-                color: white !important;           /* color de los signos + y - */
-                }
-                /* === BOTÓN === */
-                .stButton button {
-                    width: 100%;
-                    background-color: #0B0B19;
-                    color: white;
-                    font-weight: 700;
-                    font-size: 18px;
-                    padding: 1em;
-                    border-radius: 10px;
-                    margin-top: 40px;
-                }
-                </style>
-            """, unsafe_allow_html=True)
+            apply_custom_css_torneo(DEMO_THEME)
             for i, ronda in enumerate(st.session_state.fixture, start=1):
                 st.subheader(f"Ronda {i}")
             
@@ -209,66 +150,7 @@ def app():
 
         # Visualización especial para Todos Contra Todos
         if st.session_state.code_play == "AllvsAll":
-            st.markdown("""
-                <style>
-                .main-title {
-                text-align: center;
-                font-size: 32px;
-                color: #6C13BF; /* Morado/Púrpura */
-                font-weight: 700;
-                margin-bottom: 40px;
-                }
-                .match-card {
-                    background: linear-gradient(145deg, #ffffff, #f0f0f5); /* leve degradado para volumen */
-                    border-radius: 18px;
-                    padding: 22px;
-                    margin-bottom: 25px;
-                    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* sombra más profunda */
-                    border: 1px solid rgba(108, 19, 191, 0.1); /* borde tenue en tono principal */
-                    transition: transform 0.15s ease, box-shadow 0.15s ease; /* efecto al pasar el mouse */
-                }
-                .match-title {
-                    font-weight: 700;
-                    font-size: 18px;
-                    color: #0B0B19;
-                    margin-bottom: 10px;
-                }
-                .team-name {
-                    font-weight: 600;
-                    color: #0B0B19;
-                    font-size: 16px;
-                    text-align: center;
-                }
-                .vs {
-                    font-weight: 800;
-                    font-size: 20px;
-                    color: #6C13BF;
-                    text-align: center;
-                    margin-top: 8px;
-                    margin-bottom: 8px;
-                }
-                .stNumberInput input {
-                background-color: #5E3187 !important;
-                color: white !important;                 /* makes the number white */
-                font-weight: 700 !important;             /* makes it bold */
-                }
-                        
-                .stNumberInput button {
-                color: white !important;           /* color de los signos + y - */
-                }
-                /* === BOTÓN === */
-                .stButton button {
-                    width: 100%;
-                    background-color: #0B0B19;
-                    color: white;
-                    font-weight: 700;
-                    font-size: 18px;
-                    padding: 1em;
-                    border-radius: 10px;
-                    margin-top: 40px;
-                }
-                </style>
-            """, unsafe_allow_html=True)
+            apply_custom_css_torneo(DEMO_THEME)
 
             for ronda_data in st.session_state.fixture:
                 st.subheader(f"Ronda {ronda_data['ronda']}")

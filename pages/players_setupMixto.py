@@ -1,4 +1,5 @@
 import streamlit as st
+from assets.styles import apply_custom_css_setup_mixto,DEMO_THEME
 
 # -----------------------------------------------------
 # 1. FUNCIÓN CALLBACK PARA ACTUALIZAR EL NOMBRE AL INSTANTE
@@ -54,16 +55,7 @@ def app():
         st.session_state.mujeres = st.session_state.mujeres[:n_mujeres] + [""] * max(0, n_mujeres - len(st.session_state.mujeres))
 
     # === ESTILOS ===
-    st.markdown("""
-    <style>
-        .main-title { text-align: center; font-size: 32px; color: #6C13BF; font-weight: 700; margin-bottom: 40px; }
-        .gender-title { font-size: 24px; font-weight: 700; margin-top: 30px; margin-bottom: 10px; color: #0B0B19; }
-        .stTextInput input { background-color: #f7f7fb !important; border-radius: 12px !important; font-size: 18px !important; padding: 18px 10px !important; height: 45px !important; color: #0B0B19 !important; text-align: center !important; font-weight: 500 !important; border: 1px solid #ddd !important; width: 95% !important; box-sizing: border-box !important; }
-        .stTextInput input:focus { border: 2px solid #6C13BF !important; outline: none !important; }
-        div[data-testid="column"] { padding-left: 45px !important; padding-right: 45px !important; }
-        .stButton button { width: 100%; background-color: #0B0B19; color: white; font-weight: 700; font-size: 18px; padding: 1em; border-radius: 10px; margin-top: 40px; }
-    </style>
-    """, unsafe_allow_html=True)
+    apply_custom_css_setup_mixto(DEMO_THEME)
 
     cols_per_row = 4
 

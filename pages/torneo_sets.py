@@ -1,6 +1,7 @@
 import streamlit as st
 from assets.helper_funcs import generar_fixture_parejas
 from models.sets.All_pairs_sets import calcular_ranking_parejas_sets
+from assets.styles import apply_custom_css_torneo_sets, DEMO_THEME
 
 def app():
     st.markdown('<div class="main-title"> Torneo por Sets </div>', unsafe_allow_html=True)    
@@ -46,112 +47,7 @@ def app():
             st.session_state.tournament_key = tournament_key
             
     # --- Estilos CSS (Se mantienen sin cambios) ---
-    st.markdown("""
-        <style>
-        .main-title {
-            text-align: center;
-            font-size: 32px;
-            color: #6C13BF; /* Morado/Púrpura */
-            font-weight: 700;
-            margin-bottom: 40px;
-        }
-        .match-card {
-            background-color: #f7f7fb;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-        }
-
-        .stNumberInput input {
-            background-color: #5E3187 !important; /* Fondo Morado */
-            color: white !important;               /* NÚMERO BLANCO (Diferente al fondo) */
-            font-weight: 700 !important;
-            border-radius: 8px !important;
-            border: none !important;
-        }
-
-        /* 2. LOS BOTONES DE + Y - DEL NUMBER INPUT */
-        .stNumberInput button {
-            background-color: #5E3187 !important; /* Fondo Morado */
-            color: white !important;               /* SIGNOS BLANCOS (Diferente al fondo) */
-            border: none !important;
-        }
-
-        /* 3. EFECTO AL PASAR EL MOUSE POR LOS BOTONES +/- */
-        .stNumberInput button:hover {
-            background-color: #6C13BF !important; /* Un morado más claro al tocarlo */
-            color: #00CED1 !important;           /* Signos cambian a Turquesa */
-        }       
-
-        .final-match-card {
-            background-color: #5E3187; 
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .match-title {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0B0B19;
-            margin-bottom: 10px;
-        }
-        .final-title {
-            font-weight: 700;
-            font-size: 24px;
-            color: white;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .team-name {
-            font-weight: 600;
-            color: #0B0B19;
-            font-size: 16px;
-            text-align: center;
-        }
-        .final-team-name {
-            font-weight: 700;
-            color: white;
-            font-size: 20px;
-            text-align: center;
-        }
-        .vs {
-            font-weight: 800;
-            font-size: 20px;
-            color: #6C13BF;
-            text-align: center;
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-        .final-vs {
-            font-weight: 800;
-            font-size: 24px;
-            color: #00CED1; /* CAMBIO: Color turquesa estilizado */
-            text-align: center;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        /* Ajuste para que los number_input sean menos disruptivos visualmente */
-        /* Nota: Streamlit aplica sus propios estilos, estos son hacks CSS */
-        div[data-testid="stForm"] div.stNumberInput input { 
-            text-align: center;
-            font-weight: 700;
-        }
-        /* === BOTÓN === */
-        .stButton button {
-            width: 100%;
-            background-color: #0B0B19;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            padding: 1em;
-            border-radius: 10px;
-            margin-top: 40px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    apply_custom_css_torneo_sets(DEMO_THEME)
     
     # ----------------------------------------------------------------------
     # FASE DE GRUPOS (FIXTURE)
