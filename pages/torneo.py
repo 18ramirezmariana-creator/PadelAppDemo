@@ -1,7 +1,7 @@
 import streamlit as st
 from assets.helper_funcs import  calcular_ranking_parejas,initialize_vars, calcular_ranking_individual,render_nombre
 from models.AmericanoParejas.AmericanoParejasv1 import FixedPairsTournament
-from assets.styles import DEMO_THEME,apply_custom_css_torneo
+from assets.styles import DEMO_THEME,apply_custom_css_torneo,display_ranking_table
 from assets.analyze_funcs import analyze_algorithm_results
 from models.AllvsAll_Random_modelv3 import AmericanoTournament
 import pandas as pd
@@ -119,7 +119,7 @@ def app():
             if st.button("¿Cómo va el ranking? 👀", key="ranking_parejas",use_container_width=True):
                 ranking = calcular_ranking_parejas(st.session_state.parejas, st.session_state.resultados)
                 st.session_state.ranking = ranking
-                st.dataframe(ranking)
+                display_ranking_table(ranking, ranking_type="parejas")
 
 
     elif mod_parejas == "Todos Contra Todos":
@@ -230,7 +230,7 @@ def app():
             if st.button("¿Cómo va el ranking? 👀",use_container_width=True):
                 ranking = calcular_ranking_individual(st.session_state.resultados, st.session_state.fixture)
                 st.session_state.ranking = ranking
-                st.dataframe(ranking)
+                display_ranking_table(ranking, ranking_type="individual")
             
 
     # --- Navegación inferior ---

@@ -56,7 +56,7 @@ def calcular_ranking_parejas(parejas: List[str], resultados: Dict[Tuple[str,str]
     # 4. Generar el ranking
     ranking = pd.DataFrame(
         sorted(puntajes.items(), key=lambda x: x[1], reverse=True),
-        columns=["Jugador", "Puntos"]
+        columns=["Pareja", "Puntos"]
     )
     return ranking
 

@@ -100,6 +100,12 @@ DEMO_THEME = {
     'final_vs_margin_bottom': '15px',
     'font_weight_final_title': '700',
     'font_weight_final_team_name': '700',
+
+    # Nuevos parámetros para torneo mixto
+    'team_name_padding': '8px',
+    'match_card_hover_translate': '-2px',
+    'match_card_hover_shadow_values': '0 12px 28px',
+    'match_card_hover_shadow': 'rgba(0,0,0,0.2)',
 }
 
 DARK_THEME = {
@@ -727,6 +733,20 @@ def apply_custom_css_torneo(config=None):
             border-radius: {config['button_border_radius']};
             margin-top: {config['button_margin_top']};
         }}
+        /* Ensure button container also takes full width */
+        .stButton {{
+            width: 100%;
+        }}
+
+        /* For buttons inside columns */
+        div[data-testid="column"] .stButton {{
+            width: 100%;
+        }}
+
+        div[data-testid="column"] .stButton button {{
+            width: 100%;
+        }}
+        
     </style>
     """
     
@@ -962,7 +982,141 @@ def apply_custom_css_torneo_sets(config=None):
             border-radius: {config['button_border_radius']};
             margin-top: {config['button_margin_top']};
         }}
+
+        /* Ensure button container also takes full width */
+        .stButton {{
+            width: 100%;
+        }}
+
+        /* For buttons inside columns */
+        div[data-testid="column"] .stButton {{
+            width: 100%;
+        }}
+
+        div[data-testid="column"] .stButton button {{
+            width: 100%;
+        }}
     </style>
     """
     
     st.markdown(css, unsafe_allow_html=True)
+
+# components/ranking_display.py
+import streamlit as st
+import pandas as pd
+
+def display_ranking_table(ranking_df, ranking_type='individual'):
+    """
+    Muestra una tabla de ranking estilizada.
+    
+    Args:
+        ranking_df (pd.DataFrame): DataFrame con el ranking
+        ranking_type (str): 'individual' o 'parejas' para determinar la columna de nombre
+    """
+    # Determinar la columna de nombre según el tipo
+    name_col = 'Jugador' if ranking_type == 'individual' else 'Pareja'
+    points_col = 'Puntos'
+    
+    # Verificar que las columnas existan
+    if name_col not in ranking_df.columns or points_col not in ranking_df.columns:
+        st.error(f"El DataFrame debe contener las columnas '{name_col}' y '{points_col}'")
+        return
+    
+    # Generar las filas HTML
+    rows_html = ""
+    for idx, row in ranking_df.iterrows():
+        position = idx + 1
+        name = row[name_col]
+        points = row[points_col]
+        
+        # Agregar medalla para top 3
+        if position == 1:
+            position_display = '<span class="rank-medal">🥇</span>'
+        elif position == 2:
+            position_display = '<span class="rank-medal">🥈</span>'
+        elif position == 3:
+            position_display = '<span class="rank-medal">🥉</span>'
+        else:
+            position_display = str(position)
+        
+        rows_html += f"""
+        <div class="ranking-row">
+            <div class="rank-position">{position_display}</div>
+            <div class="player-name">{name}</div>
+            <div class="player-points">{points}</div>
+        </div>
+        """
+    
+    # Renderizar la tabla completa
+    st.markdown(f"""
+        <style>
+            .ranking-table {{
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto 40px auto;
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }}
+            
+            .ranking-header {{
+                background: linear-gradient(145deg, #6C13BF, #5E3187);
+                color: white;
+                padding: 15px;
+                display: grid;
+                grid-template-columns: 60px 1fr 80px;
+                font-weight: 700;
+                font-size: 16px;
+            }}
+            
+            .ranking-row {{
+                background-color: white;
+                padding: 12px 15px;
+                display: grid;
+                grid-template-columns: 60px 1fr 80px;
+                align-items: center;
+                border-bottom: 1px solid #f0f0f0;
+                transition: background-color 0.2s ease;
+            }}
+            
+            .ranking-row:hover {{
+                background-color: #f7f7fb;
+            }}
+            
+            .ranking-row:last-child {{
+                border-bottom: none;
+            }}
+            
+            .rank-position {{
+                font-weight: 700;
+                color: #6C13BF;
+                font-size: 18px;
+            }}
+            
+            .player-name {{
+                font-weight: 600;
+                color: #0B0B19;
+                font-size: 16px;
+            }}
+            
+            .player-points {{
+                text-align: right;
+                font-weight: 700;
+                color: #5E3187;
+                font-size: 16px;
+            }}
+            
+            .rank-medal {{
+                font-size: 24px;
+            }}
+        </style>
+        
+        <div class="ranking-table">
+            <div class="ranking-header">
+                <div>Pos.</div>
+                <div>{name_col}</div>
+                <div style="text-align: right;">Puntos</div>
+            </div>
+            {rows_html}
+        </div>
+    """, unsafe_allow_html=True)

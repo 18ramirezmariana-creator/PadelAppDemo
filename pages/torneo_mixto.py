@@ -1,6 +1,6 @@
 import streamlit as st
 from models.AmericanoMixto.AllvsAll_MixtoV2 import AmericanoPadelTournament, generar_torneo_mixto,analyze_algorithm_results
-from assets.styles import apply_custom_css_torneo_mixto, DEMO_THEME
+from assets.styles import apply_custom_css_torneo_mixto, DEMO_THEME,display_ranking_table
 from assets.helper_funcs import initialize_vars, calcular_ranking_individual, render_nombre
 from assets.analyze_funcs import heatmap_parejas_mixtas,heatmap_descansos_por_ronda, heatmap_enfrentamientos
 from collections import defaultdict
@@ -173,7 +173,7 @@ def app():
                 
                 if ranking is not None and not ranking.empty:
                     st.session_state.ranking = ranking
-                    st.dataframe(ranking, use_container_width=True)
+                    display_ranking_table(ranking, ranking_type="individual")
                 else:
                     st.warning("⚠️ No hay suficientes resultados para calcular el ranking")
             except Exception as e:

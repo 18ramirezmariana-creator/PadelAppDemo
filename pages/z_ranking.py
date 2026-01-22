@@ -13,11 +13,13 @@ def app():
     # --- Estilos Podio ---
     col2, col1, col3 = st.columns([1, 1, 1])
     define_ranking_items(df,col1,col2,col3)
-    
 
-    col2, col1, col3, col4 = st.columns([1, 1, 1, 1])
+    # --- Espacio entre el podio y los botones ---
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
-        if st.button("Volver"):
+        if st.button("Volver",use_container_width=True):
             if ("mixto_op" in st.session_state) and (st.session_state.mixto_op == "Siempre Mixto"):
                 st.session_state.page = "torneo_mixto"
             elif ("num_sets" in st.session_state) and (st.session_state.mod == 'Parejas Fijas'):
@@ -26,7 +28,7 @@ def app():
                 st.session_state.page = "torneo"
             st.rerun()
     with col4:
-        if st.button("Empezar Nuevo Torneo"):
+        if st.button("Empezar Nuevo Torneo",use_container_width=True):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.session_state.page = "home"

@@ -75,6 +75,14 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
     """
     df = df_group_ranking.copy()
     sets_flag = "Diferencia de Sets" in df.columns
+
+    if 'Pareja' in df.columns:
+        name_column = 'Pareja'
+    elif 'Jugador' in df.columns:
+        name_column = 'Jugador'
+    else:
+        st.error("El DataFrame debe contener una columna 'Jugador' o 'Pareja'")
+        return
     
     # Efecto metálico para cada puesto
     gold_gradient = "linear-gradient(145deg, #FFD700, #E6C200, #FFF6A0)"
@@ -99,13 +107,13 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
         runner_up = final_teams[1] if winner == final_teams[0] else final_teams[0]
         
         # 2. Obtener las filas del grupo para mantener los stats (Puntos/DS)
-        winner_row = df[df['Pareja'] == winner].iloc[0]
-        runner_up_row = df[df['Pareja'] == runner_up].iloc[0]
+        winner_row = df[df[name_column] == winner].iloc[0]
+        runner_up_row = df[df[name_column] == runner_up].iloc[0]
 
         # 3. Obtener el tercer lugar (el mejor rankeado que no jugó la final)
         
         # Equipos que no jugaron la final
-        non_finalists_df = df[~df['Pareja'].isin([winner, runner_up])]
+        non_finalists_df = df[~df[name_column].isin([winner, runner_up])]
         
         if not non_finalists_df.empty:
             third_place_row = non_finalists_df.iloc[0]
@@ -117,7 +125,7 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
             final_podium_df = pd.DataFrame(podium_list)
             
             # Los demás participantes son el resto del ranking, sin el top 3
-            others = df[~df['Pareja'].isin(final_podium_df['Pareja'].tolist())]
+            others = df[~df[name_column].isin(final_podium_df[name_column].tolist())]
         else:
             # Caso especial: solo hay 2 equipos o no se puede determinar el 3ro.
             final_podium_df = pd.DataFrame([winner_row.to_dict(), runner_up_row.to_dict()])
@@ -142,7 +150,7 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
                 # Si se usó la lógica de la final, muestra CAMPEÓN y oculta la diferencia de sets
                 status_label = "CAMPEÓN" if use_final_ranking else None
                 show_diff = not use_final_ranking # Determina si se oculta la DS
-                podium_card_sets("🥇 1er Puesto", row["Pareja"], row["Puntos"], row["Diferencia de Sets"], gold_gradient, 300, status_label=status_label, show_diff=show_diff)
+                podium_card_sets("🥇 1er Puesto", row[name_column], row["Puntos"], row["Diferencia de Sets"], gold_gradient, 300, status_label=status_label, show_diff=show_diff)
         
         # Top 2
         with col2:
@@ -151,30 +159,30 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
                 # Si se usó la lógica de la final, muestra SUBCAMPEÓN FINAL y oculta la diferencia de sets
                 status_label = "SUBCAMPEÓN" if use_final_ranking else None
                 show_diff = not use_final_ranking # Determina si se oculta la DS
-                podium_card_sets("🥈 2do Puesto", row["Pareja"], row["Puntos"], row["Diferencia de Sets"], silver_gradient, 260, status_label=status_label, show_diff=show_diff)
+                podium_card_sets("🥈 2do Puesto", row[name_column], row["Puntos"], row["Diferencia de Sets"], silver_gradient, 260, status_label=status_label, show_diff=show_diff)
         
         # Top 3 (siempre muestra los puntos del ranking de fase de grupos y la DS)
         with col3:
             if len(final_podium_df) >= 3:
                 row = final_podium_df.iloc[2]
-                podium_card_sets("🥉 3er Puesto", row["Pareja"], row["Puntos"], row["Diferencia de Sets"], bronze_gradient, 230, show_diff=True)
+                podium_card_sets("🥉 3er Puesto", row[name_column], row["Puntos"], row["Diferencia de Sets"], bronze_gradient, 230, show_diff=True)
                 
     elif not final_podium_df.empty: # Torneo por Puntos (Jugador)
         # Top 1
         with col1:
             if len(final_podium_df) >= 1:
                 row = final_podium_df.iloc[0]
-                podium_card("🥇 1er Puesto", row["Jugador"], row["Puntos"], gold_gradient, 300)
+                podium_card("🥇 1er Puesto", row[name_column], row["Puntos"], gold_gradient, 300)
         # Top 2
         with col2:
             if len(final_podium_df) >= 2:
                 row = final_podium_df.iloc[1]
-                podium_card("🥈 2do Puesto", row["Jugador"], row["Puntos"], silver_gradient, 260)
+                podium_card("🥈 2do Puesto", row[name_column], row["Puntos"], silver_gradient, 260)
         # Top 3
         with col3:
             if len(final_podium_df) >= 3:
                 row = final_podium_df.iloc[2]
-                podium_card("🥉 3er Puesto", row["Jugador"], row["Puntos"], bronze_gradient, 230)
+                podium_card("🥉 3er Puesto", row[name_column], row["Puntos"], bronze_gradient, 230)
 
     # Others rendering (for both sets and points)
     if not others.empty:
@@ -199,7 +207,7 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
                                 align-items:center;">
 
                 <span style="font-weight:600; color:#5E3187; min-width: 100px;">
-                    {rank_position}ᵗʰ — {row['Pareja']}
+                    {rank_position}ᵗʰ — {row[name_column]}
                 </span>
 
                 <div style="text-align: right;">
@@ -225,7 +233,7 @@ def define_ranking_items(df_group_ranking, col1, col2, col3):
                                 display:flex;
                                 justify-content:space-between;
                                 align-items:center;">
-                    <span style="font-weight:600; color:#5E3187;">{rank_position}ᵗʰ — {row['Jugador']}</span>
+                    <span style="font-weight:600; color:#5E3187;">{rank_position}ᵗʰ — {row[name_column]}</span>
                     <span style="font-weight:500; color:#333;">{row['Puntos']} pts</span>
                     </div>
                 """, unsafe_allow_html=True)
