@@ -2,14 +2,51 @@ import streamlit as st
 from models.AmericanoMixto.AllvsAll_MixtoV2 import AmericanoPadelTournament, generar_torneo_mixto,analyze_algorithm_results
 from assets.styles import apply_custom_css_torneo_mixto, DEMO_THEME,display_ranking_table
 from assets.helper_funcs import initialize_vars, calcular_ranking_individual, render_nombre
+from assets.backup import save_to_localstorage, load_from_localstorage,clear_localstorage
 from assets.analyze_funcs import heatmap_parejas_mixtas,heatmap_descansos_por_ronda, heatmap_enfrentamientos
 from collections import defaultdict
 import random
 import pandas as pd
 
 def app():
+    if 'data_loaded_from_local_storage' not in st.session_state:
+        saved_data = load_from_localstorage()
+
+        if saved_data and saved_data.get('mod') == 'Todos Contra Todos' and saved_data.get('mixto_op') == 'Siempre Mixto':
+            st.session_state.fixture = saved_data.get('fixture', [])
+            st.session_state.resultados = saved_data.get('resultados', {})
+            st.session_state.tournament_key = saved_data.get('tournament_key', '')
+            st.session_state.out = saved_data.get('out', {})
+            st.success("✅ Torneo Mixto recuperado")
+        st.session_state.data_loaded_from_local_storage = True
+            
+
     st.markdown('<div class="main-title"> Torneo Americano Mixto </div>', unsafe_allow_html=True)
+     # Initialize resultados if not exists
+    if 'resultados' not in st.session_state:
+        st.session_state.resultados = {}
     
+    # Get players and settings from session state
+    male_players = st.session_state.hombres
+    female_players = st.session_state.mujeres
+    num_canchas = st.session_state.num_fields
+    puntos_partido = st.session_state.num_pts
+
+    def save_current_state():
+        """Guardar el estado actual del torneo en localStorage."""
+        data_to_save = {
+            'fixture': st.session_state.get('fixture', []),
+            'resultados': st.session_state.get('resultados', {}),
+            'tournament_key': st.session_state.get('tournament_key', ''),
+            'out': st.session_state.get('out', {}),
+            'mod': 'Todos Contra Todos',
+            'mixto_op': 'Siempre Mixto',
+            'num_fields': num_canchas,
+            'num_pts': puntos_partido,
+            'hombres': male_players,
+            'mujeres': female_players
+        }
+        save_to_localstorage(data_to_save)
     # -----------------------------------------------------
     # 1. FUNCIÓN CALLBACK PARA GUARDAR RESULTADOS AL INSTANTE
     # -----------------------------------------------------
@@ -20,20 +57,11 @@ def app():
             val2 = st.session_state[pareja2_key]
             # La clave de resultados es un tuple de las parejas involucradas
             st.session_state.resultados[(pareja1_str, pareja2_str)] = (val1, val2)
+            save_current_state()  
         except KeyError:
             # Esto puede ocurrir si se llama antes de que se hayan inicializado las keys, ignorar
             pass
     # -----------------------------------------------------
-    
-    # Initialize resultados if not exists
-    if 'resultados' not in st.session_state:
-        st.session_state.resultados = {}
-    
-    # Get players and settings from session state
-    male_players = st.session_state.hombres
-    female_players = st.session_state.mujeres
-    num_canchas = st.session_state.num_fields
-    puntos_partido = st.session_state.num_pts
 
     # Validate equal numbers
     if len(male_players) != len(female_players):
@@ -57,6 +85,7 @@ def app():
             # Al cambiar la llave del torneo, esto indica un torneo nuevo, así que lo borramos.
             st.session_state.resultados = {}
             st.session_state.tournament_key = tournament_key
+            save_current_state()
 
     # Custom CSS
     apply_custom_css_torneo_mixto(DEMO_THEME)
@@ -188,6 +217,7 @@ def app():
                 
                 if ranking is not None and not ranking.empty:
                     st.session_state.ranking = ranking
+                    save_current_state()
                     st.session_state.page = "z_ranking"
                     st.rerun()
                 else:
@@ -200,6 +230,7 @@ def app():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col1:
         if st.button("⬅️ Volver", key="back_button", use_container_width=True):
+            clear_localstorage()
             # Clear tournament data when going back (esto es correcto)
             if 'tournament_key' in st.session_state:
                 del st.session_state.tournament_key
