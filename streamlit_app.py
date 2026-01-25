@@ -4,6 +4,7 @@ import os,importlib
 from assets.sidebar import sidebar_style
 from assets.styles import apply_custom_css_main, apply_custom_css_player_setup, DEMO_THEME
 from assets.helper_funcs import initialize_vars
+from assets.backup import load_from_localstorage, clear_localstorage
 st.set_page_config(page_title=" Padel App",page_icon=":tennis:", layout="wide")
 hide_streamlit_style = """
     <style>
@@ -13,6 +14,36 @@ hide_streamlit_style = """
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# 🔥 VERIFICAR LOCALSTORAGE AL INICIO - ANTES DE TODO
+if 'checked_localstorage' not in st.session_state:
+    saved_data = load_from_localstorage()
+    if saved_data:
+        st.session_state.num_fields = saved_data.get('num_fields', 2)
+        st.session_state.num_pts = saved_data.get('num_pts', 16)
+        st.session_state.mod = saved_data.get('mod', 'Parejas Fijas')
+        st.session_state.players = saved_data.get('players', [])
+        st.session_state.num_players = len(st.session_state.players)
+        # Restaurar datos del torneo
+        st.session_state.fixture = saved_data.get('fixture', [])
+        st.session_state.resultados = saved_data.get('resultados', {})
+        st.session_state.code_play = saved_data.get('code_play', '')
+        st.session_state.tournament_key = saved_data.get('tournament_key', '')
+         # Restaurar datos específicos del modo
+        if 'parejas' in saved_data:
+            st.session_state.parejas = saved_data['parejas']
+        if 'out' in saved_data:
+            st.session_state.out = saved_data['out']
+        if 'mixto_op' in saved_data:
+            st.session_state.mixto_op = saved_data['mixto_op']
+        if 'num_sets' in saved_data:
+            st.session_state.num_sets = saved_data['num_sets']
+            # 🎯 IR DIRECTAMENTE A LA PÁGINA DEL TORNEO
+        st.session_state.page = "torneo"
+        st.session_state.data_loaded_from_storage = True
+    st.session_state.checked_localstorage = True
+
+
 #if not check_login():
 #    st.stop()
 
@@ -25,6 +56,22 @@ def load_page(page_name):
     if page_name == "home":
 
         apply_custom_css_main(DEMO_THEME)
+        # 🔥 MOSTRAR MENSAJE SI HAY TORNEO GUARDADO
+        saved_data = load_from_localstorage()
+        if saved_data:
+            st.info("💾 Tienes un torneo guardado. ¿Quieres continuar donde lo dejaste?")
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("✅ Continuar Torneo Guardado", use_container_width=True):
+                    st.session_state.page = "torneo"
+                    st.rerun()
+            with col2:
+                if st.button("🗑️ Borrar y Empezar Nuevo Torneo", use_container_width=True):
+                    clear_localstorage()
+                    st.rerun()
+            
+            st.divider()
+            st.markdown("**O configura un nuevo torneo:**")
         # Título centrado
         st.markdown('<div class="main-title">🏆 Tu Padel App</div>', unsafe_allow_html=True)
 
@@ -86,6 +133,8 @@ def load_page(page_name):
 
         if st.button("Continuar a Registro de Jugadores",key="button0",use_container_width=True):
             if can_continue:
+                # 🔥 LIMPIAR LOCALSTORAGE AL EMPEZAR NUEVO TORNEO
+                clear_localstorage()
                 if mixto:
                     st.session_state.page = "players_setupMixto"
                     st.rerun()
