@@ -2,8 +2,23 @@ import streamlit as st
 from assets.helper_funcs import generar_fixture_parejas
 from models.sets.All_pairs_sets import calcular_ranking_parejas_sets
 from assets.styles import apply_custom_css_torneo_sets, DEMO_THEME
+from assets.backup import save_to_localstorage, load_from_localstorage, clear_localstorage
 
 def app():
+    if 'data_loaded_from_storage' not in st.session_state:
+        saved_data = load_from_localstorage()
+        if saved_data and saved_data.get('scoring') == 'Sets':
+            st.session_state.fixture = saved_data.get('fixture', [])
+            st.session_state.resultados = saved_data.get('resultados', {})
+            st.session_state.tournament_key = saved_data.get('tournament_key', '')
+            st.session_state.parejas = saved_data.get('parejas', [])
+            st.session_state.show_final = saved_data.get('show_final', False)
+            st.session_state.show_ranking = saved_data.get('show_ranking', False)
+            st.session_state.final_match_scores = tuple(saved_data.get('final_match_scores', [0, 0]))
+            st.success("✅ Torneo por sets restaurado!")
+        
+        st.session_state.data_loaded_from_storage = True
+
     st.markdown('<div class="main-title"> Torneo por Sets </div>', unsafe_allow_html=True)    
     if 'num_fields' not in st.session_state: st.session_state.num_fields = 1
     if 'num_sets' not in st.session_state: st.session_state.num_sets = 3
@@ -22,6 +37,24 @@ def app():
     if 'final_match_scores' not in st.session_state: st.session_state.final_match_scores = (0, 0)
     
     parejas = st.session_state.parejas
+
+    def save_current_state():
+        """Guardar estado del torneo por sets en localStorage"""
+        data_to_save = {
+            'fixture': st.session_state.get('fixture', []),
+            'resultados': st.session_state.get('resultados', {}),
+            'tournament_key': st.session_state.get('tournament_key', ''),
+            'parejas': parejas,
+            'show_final': st.session_state.get('show_final', False),
+            'show_ranking': st.session_state.get('show_ranking', False),
+            'final_match_scores': list(st.session_state.get('final_match_scores', (0, 0))),
+            'mod': st.session_state.mod,
+            'scoring': 'Sets',
+            'num_fields': num_canchas,
+            'num_sets': num_sets,
+            'players': st.session_state.get('players', []),
+        }
+        save_to_localstorage(data_to_save)
     
     # 2. 🔄 FUNCIÓN CALLBACK: Actualiza el diccionario 'resultados' (Fase de Grupos)
     def actualizar_resultado_sets(p1, p2, k1, k2):
@@ -29,6 +62,7 @@ def app():
         val1 = st.session_state.get(k1, 0)
         val2 = st.session_state.get(k2, 0)
         st.session_state.resultados[(p1, p2)] = (val1, val2)
+        save_current_state()
         
     # 3. 🏆 FUNCIÓN CALLBACK: Actualiza el resultado de la Final
     def actualizar_final_score(k1, k2):
@@ -36,6 +70,7 @@ def app():
         val1 = st.session_state.get(k1, 0)
         val2 = st.session_state.get(k2, 0)
         st.session_state.final_match_scores = (val1, val2)
+        save_current_state()
     
     # Generación de fixture
     tournament_key = f"parejas_fijas_{len(parejas)}_{num_canchas}_{num_sets}_sets"
@@ -45,6 +80,7 @@ def app():
             st.session_state.resultados = {}
             st.session_state.parejas = parejas
             st.session_state.tournament_key = tournament_key
+            save_current_state()
             
     # --- Estilos CSS (Se mantienen sin cambios) ---
     apply_custom_css_torneo_sets(DEMO_THEME)
@@ -111,6 +147,7 @@ def app():
         btn_label = "Ocultar Ranking 🔼" if st.session_state.show_ranking else "¿Cómo va el ranking? 👀"
         if st.button(btn_label, use_container_width=True):
             st.session_state.show_ranking = not st.session_state.show_ranking # Toglea el estado
+            save_current_state()
             st.rerun() # Dispara el renderizado
             
     with colX:
@@ -124,6 +161,7 @@ def app():
         if df_ranking_temp is not None and len(df_ranking_temp) >= 2 and not st.session_state.show_final:
             if st.button("🎉 Mostrar Gran Final 🎉", use_container_width=True):
                 st.session_state.show_final = True
+                save_current_state()
                 st.rerun() # Disparar un nuevo renderizado para mostrar la final
 
     # ----------------------------------------------------------------------
@@ -251,6 +289,7 @@ def app():
     
     with col1:
         if st.button("⬅️ Volver", key="back_buttonS", use_container_width=True):
+            clear_localstorage()
             # Limpiar datos del torneo al volver
             if 'tournament_key' in st.session_state:
                 del st.session_state.tournament_key
@@ -264,6 +303,8 @@ def app():
                 del st.session_state.final_match_scores
             if 'show_ranking' in st.session_state: # Limpiar el nuevo estado
                 del st.session_state.show_ranking
+            if 'data_loaded_from_storage' in st.session_state:
+                del st.session_state.data_loaded_from_storage
                 
             st.session_state.page = "players_setup"
             st.rerun()
@@ -276,6 +317,7 @@ def app():
                 
                 if df_ranking is not None and not df_ranking.empty:
                     st.session_state.ranking = df_ranking
+                    save_current_state()
                     st.session_state.page = "z_ranking"
                     st.rerun()
                 else:
