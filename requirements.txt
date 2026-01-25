@@ -3,3 +3,4 @@ pandas
 seaborn
 matplotlib
 bcrypt
+streamlit_javascript
