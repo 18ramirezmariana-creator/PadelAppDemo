@@ -3,7 +3,7 @@ from assets.helper_funcs import generar_fixture_parejas
 from models.sets.All_pairs_sets import calcular_ranking_parejas_sets
 from assets.styles import apply_custom_css_torneo_sets, DEMO_THEME
 from assets.backup import save_to_localstorage, load_from_localstorage, clear_localstorage
-
+import pandas as pd
 def app():
     if 'data_loaded_from_storage' not in st.session_state:
         saved_data = load_from_localstorage()
@@ -84,6 +84,20 @@ def app():
             
     # --- Estilos CSS (Se mantienen sin cambios) ---
     apply_custom_css_torneo_sets(DEMO_THEME)
+    st.markdown(f"""
+        <style>
+        div[data-testid="stWidgetLabel"] p {{
+            color: {DEMO_THEME['text_dark']} !important;
+            font-weight: {DEMO_THEME['font_weight_labels']} !important;
+            font-size: 14px !important;
+            text-align: center !important;
+        }}
+        div[data-testid="stWidgetLabel"] {{
+            justify-content: center !important;
+            display: flex !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
     
     # ----------------------------------------------------------------------
     # FASE DE GRUPOS (FIXTURE)
@@ -268,13 +282,19 @@ def app():
             # Mostrar el ganador dinámicamente (lee de st.session_state.final_match_scores)
             final_score1, final_score2 = st.session_state.final_match_scores
             final_winner = ""
+            final_loser= ""
+
             if final_score1 > final_score2:
                 final_winner = final_p1
+                final_loser = final_p2
             elif final_score2 > final_score1:
                 final_winner = final_p2
+                final_loser = final_p1
             
             if final_winner:
                 st.success(f"🎉 **Ganador de la Final:** {final_winner} ({final_score1}-{final_score2})")
+                st.session_state.final_winner = final_winner
+                st.session_state.final_loser = final_loser
             elif final_score1 > 0 or final_score2 > 0:
                 st.warning("El partido es un empate (Games iguales).")
             else:
@@ -316,7 +336,34 @@ def app():
                 df_ranking = calcular_ranking_parejas_sets(parejas, st.session_state.resultados)
                 
                 if df_ranking is not None and not df_ranking.empty:
-                    st.session_state.ranking = df_ranking
+                    # Si hubo final y hay un ganador guardado, ajustar el ranking
+                    if hasattr(st.session_state, 'final_winner') and st.session_state.final_winner:
+                        campeon = st.session_state.final_winner
+                        subcampeon = st.session_state.final_loser
+                        # Crear ranking ajustado
+                        df_ranking_ajustado = df_ranking.copy()
+                        
+                        # Encontrar índices de campeón y subcampeón
+                        idx_campeon = df_ranking[df_ranking['Pareja'] == campeon].index[0]
+                        idx_subcampeon = df_ranking[df_ranking['Pareja'] == subcampeon].index[0]
+                        
+                        # Extraer las filas
+                        fila_campeon = df_ranking.loc[idx_campeon].copy()
+                        fila_subcampeon = df_ranking.loc[idx_subcampeon].copy()
+                        
+                        # Eliminar campeón y subcampeón del ranking
+                        df_ranking_ajustado = df_ranking_ajustado.drop([idx_campeon, idx_subcampeon])
+                        
+                        # Recrear el dataframe con el orden correcto: 1° Campeón, 2° Subcampeón, resto
+                        df_ranking_final = pd.concat([
+                            pd.DataFrame([fila_campeon]),
+                            pd.DataFrame([fila_subcampeon]),
+                            df_ranking_ajustado
+                        ], ignore_index=True)
+                        
+                        st.session_state.ranking = df_ranking_final
+                    else:
+                        st.session_state.ranking = df_ranking
                     save_current_state()
                     st.session_state.page = "z_ranking"
                     st.rerun()
