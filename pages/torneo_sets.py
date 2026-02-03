@@ -122,7 +122,7 @@ def app():
                         key=score1_key, 
                         min_value=0, 
                         value=saved_s1, # Usa el valor guardado
-                        label_visibility="collapsed",
+                        #label_visibility="collapsed",
                         on_change=actualizar_resultado_sets, # ✅ CALLBACK GRUPOS P1
                         kwargs={"p1": p1, "p2": p2, "k1": score1_key, "k2": score2_key}
                     )
@@ -132,7 +132,7 @@ def app():
                         key=score2_key, 
                         min_value=0, 
                         value=saved_s2, # Usa el valor guardado
-                        label_visibility="collapsed",
+                        #label_visibility="collapsed",
                         on_change=actualizar_resultado_sets, # ✅ CALLBACK GRUPOS P2
                         kwargs={"p1": p1, "p2": p2, "k1": score1_key, "k2": score2_key}
                     )

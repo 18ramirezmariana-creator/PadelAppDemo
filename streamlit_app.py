@@ -121,7 +121,7 @@ def load_page(page_name):
         if pts == "Puntos":
             summary_text += f". Partidos a <strong>{st.session_state.num_pts} puntos</strong>."
         elif pts == "Sets":
-            summary_text += f". Partidos a <strong>{st.session_state.num_sets} sets</strong>."
+            summary_text += f". Partidos a <strong>{st.session_state.num_sets} games</strong>."
         
         summary_html = f"""
         <div class="tournament-summary">
