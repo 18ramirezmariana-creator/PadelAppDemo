@@ -13,9 +13,9 @@ def calcular_ranking_parejas_sets(parejas, resultados):
     ranking_data = {p: {
         'Partidos Jugados': 0, # PJ
         'Puntos': 0,         # P (1 point for a match win)
-        'Sets Ganados': 0,   # SG
-        'Sets Perdidos': 0,  # SP
-        'Diferencia de Sets': 0 # DS (SG - SP)
+        'Games Ganados': 0,   # SG
+        'Games Perdidos': 0,  # SP
+        'Diferencia de Games': 0 # DS (SG - SP)
     } for p in parejas}
 
     for (p1, p2), (s1, s2) in resultados.items():
@@ -28,10 +28,10 @@ def calcular_ranking_parejas_sets(parejas, resultados):
         ranking_data[p2]['Partidos Jugados'] += 1
 
         # Update Sets
-        ranking_data[p1]['Sets Ganados'] += s1
-        ranking_data[p1]['Sets Perdidos'] += s2
-        ranking_data[p2]['Sets Ganados'] += s2
-        ranking_data[p2]['Sets Perdidos'] += s1
+        ranking_data[p1]['Games Ganados'] += s1
+        ranking_data[p1]['Games Perdidos'] += s2
+        ranking_data[p2]['Games Ganados'] += s2
+        ranking_data[p2]['Games Perdidos'] += s1
 
         # Determine Winner and Update Points
         if s1 > s2:
@@ -45,7 +45,7 @@ def calcular_ranking_parejas_sets(parejas, resultados):
     # Calculate Sets Difference (DS)
     for p in parejas:
         data = ranking_data[p]
-        data['Diferencia de Sets'] = data['Sets Ganados'] - data['Sets Perdidos']
+        data['Diferencia de Games'] = data['Games Ganados'] - data['Games Perdidos']
 
     # Convert to DataFrame and sort
     df_ranking = pd.DataFrame.from_dict(ranking_data, orient='index')
@@ -53,7 +53,7 @@ def calcular_ranking_parejas_sets(parejas, resultados):
 
     # Sort Ranking: 1. Puntos (desc), 2. Diferencia de Sets (desc), 3. Sets Ganados (desc)
     df_ranking = df_ranking.sort_values(
-        by=['Puntos', 'Diferencia de Sets', 'Sets Ganados'],
+        by=['Puntos', 'Diferencia de Games', 'Games Ganados'],
         ascending=[False, False, False]
     ).reset_index(drop=True)
     df_ranking.index = df_ranking.index + 1 # Use 1-based indexing for ranking display

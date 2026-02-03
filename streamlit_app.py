@@ -44,8 +44,8 @@ if 'checked_localstorage' not in st.session_state:
     st.session_state.checked_localstorage = True
 
 
-#if not check_login():
-#    st.stop()
+if not check_login():
+    st.stop()
 
 # Cargar la lista de páginas desde la carpeta "pages"
 pages_list = ["home"] + [f.replace(".py", "") for f in os.listdir("pages") if f.endswith(".py")]
@@ -101,7 +101,7 @@ def load_page(page_name):
             if st.session_state.mod == "Parejas Fijas":
                 pts = st.selectbox("Formato Puntaje", ["Sets","Puntos"],key="scoring",index=1)
                 if pts == "Sets":
-                    num_sets = st.number_input("Número de sets",value=6,key="num_sets_input")
+                    num_sets = st.number_input("Número de games",value=6,key="num_sets_input")
                     st.session_state.num_sets = num_sets
             elif st.session_state.mod == "Todos Contra Todos":
                 pts = "Puntos"

@@ -118,7 +118,7 @@ def app():
 
                 with colA:
                     st.number_input(
-                        f"Sets {p1}", 
+                        f"Games {p1}", 
                         key=score1_key, 
                         min_value=0, 
                         value=saved_s1, # Usa el valor guardado
@@ -128,7 +128,7 @@ def app():
                     )
                 with colB:
                     st.number_input(
-                        f"Sets {p2}", 
+                        f"Games {p2}", 
                         key=score2_key, 
                         min_value=0, 
                         value=saved_s2, # Usa el valor guardado
@@ -170,7 +170,7 @@ def app():
     if st.session_state.show_ranking:
         st.markdown("<hr style='border: 1px solid #ddd; margin: 30px 0;'>", unsafe_allow_html=True)
         st.header('📊 Clasificación Actual')
-        st.info(f"Regla: 1 Punto por partido ganado. Desempate por Diferencia de Sets (SG - SP).")
+        st.info(f"Regla: 1 Punto por partido ganado. Desempate por Diferencia de Games (G - P).")
         
         try:
             df_ranking = calcular_ranking_parejas_sets(parejas, st.session_state.resultados)
@@ -179,15 +179,15 @@ def app():
                 'Pareja': st.column_config.TextColumn("Pareja"), # Asegura que la columna Pareja sea TextColumn
                 'Partidos Jugados': st.column_config.NumberColumn("Partidos Jugados", format="%d"),
                 'Puntos': st.column_config.NumberColumn("Puntos", format="%d"),
-                'Sets Ganados': st.column_config.NumberColumn("Sets Ganados", format="%d"),
-                'Sets Perdidos': st.column_config.NumberColumn("Sets Perdidos", format="%d"),
-                'Diferencia de Sets': st.column_config.NumberColumn("Diferencia de Sets", format="%d"),
+                'Games Ganados': st.column_config.NumberColumn("Games Ganados", format="%d"),
+                'Games Perdidos': st.column_config.NumberColumn("Games Perdidos", format="%d"),
+                'Diferencia de Games': st.column_config.NumberColumn("Diferencia de Games", format="%d"),
             }
             
             # El uso de use_container_width=True aquí garantiza que ocupe todo el ancho disponible.
             st.dataframe(
                 df_ranking, 
-                column_order=('Pareja', 'Partidos Jugados', 'Puntos', 'Sets Ganados', 'Sets Perdidos', 'Diferencia de Sets'),
+                column_order=('Pareja', 'Partidos Jugados', 'Puntos', 'Games Ganados', 'Games Perdidos', 'Diferencia de Games'),
                 column_config=col_config,
                 use_container_width=True 
             )
@@ -231,7 +231,7 @@ def app():
                 </div>
             """, unsafe_allow_html=True)
 
-            st.markdown(f"<p style='text-align:center; font-weight:600; color:#000000;'>Introduce los sets de la Final</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align:center; font-weight:600; color:#000000;'>Introduce los Games de la Final</p>", unsafe_allow_html=True)
             colA, colB = st.columns(2)
             
             # Usar claves únicas para el resultado de la final
@@ -245,7 +245,7 @@ def app():
             with colA:
                 st.markdown(f"<p style='color: #000000; font-weight: 600; text-align: center; margin-bottom: 5px;'>{final_p1}</p>", unsafe_allow_html=True)
                 st.number_input(
-                    f"Sets {final_p1}", 
+                    f"Games {final_p1}", 
                     key=final_key_p1, 
                     min_value=0, 
                     value=final_saved_s1,
@@ -256,7 +256,7 @@ def app():
             with colB:
                 st.markdown(f"<p style='color: #000000; font-weight: 600; text-align: center; margin-bottom: 5px;'>{final_p2}</p>", unsafe_allow_html=True)
                 st.number_input(
-                    f"Sets {final_p2}", 
+                    f"Games {final_p2}", 
                     key=final_key_p2, 
                     min_value=0, 
                     value=final_saved_s2,
@@ -276,7 +276,7 @@ def app():
             if final_winner:
                 st.success(f"🎉 **Ganador de la Final:** {final_winner} ({final_score1}-{final_score2})")
             elif final_score1 > 0 or final_score2 > 0:
-                st.warning("El partido es un empate (Sets iguales).")
+                st.warning("El partido es un empate (Games iguales).")
             else:
                 st.markdown("<p style='text-align:center;'>Pendiente de resultado</p>", unsafe_allow_html=True)
 
