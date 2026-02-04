@@ -1,6 +1,6 @@
-streamlit
-pandas
-seaborn
-matplotlib
-bcrypt
-streamlit_javascript
+streamlit==1.31.0
+pandas==2.1.4
+matplotlib==3.8.2
+seaborn==0.13.0
+bcrypt==4.1.2
+streamlit-javascript==0.1.5
