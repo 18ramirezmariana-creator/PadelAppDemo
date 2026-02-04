@@ -1,6 +1,4 @@
 import streamlit as st
-import matplotlib
-matplotlib.use('Agg')  # Fuerza a Matplotlib a no usar interfaces gráficas (Tkinter)
 from assets.auth import check_login
 import os,importlib
 from assets.sidebar import sidebar_style
