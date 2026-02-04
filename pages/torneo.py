@@ -7,6 +7,8 @@ from models.AllvsAll_Random_modelv3 import AmericanoTournament
 from assets.backup import save_to_localstorage, load_from_localstorage, clear_localstorage
 import pandas as pd
 import seaborn as sns
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import itertools,random
 import numpy as np

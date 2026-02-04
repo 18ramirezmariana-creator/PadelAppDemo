@@ -3,6 +3,8 @@ from collections import defaultdict
 import random
 import pandas as pd
 import seaborn as sns
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
