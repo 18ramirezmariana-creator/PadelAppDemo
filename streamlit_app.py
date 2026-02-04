@@ -44,8 +44,8 @@ if 'checked_localstorage' not in st.session_state:
     st.session_state.checked_localstorage = True
 
 
-#if not check_login():
-#    st.stop()
+if not check_login():
+    st.stop()
 
 # Cargar la lista de páginas desde la carpeta "pages"
 pages_list = ["home"] + [f.replace(".py", "") for f in os.listdir("pages") if f.endswith(".py")]

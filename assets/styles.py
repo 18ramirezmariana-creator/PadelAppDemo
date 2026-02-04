@@ -1,4 +1,3 @@
-from turtle import color
 import streamlit as st
 
 # ============================================
@@ -853,15 +852,28 @@ def apply_custom_css_torneo_mixto(config=None):
 
 
 def apply_custom_css_torneo_sets(config=None):
+    """
+    Aplica los estilos CSS personalizados para la página de torneo por sets.
+    
+    Args:
+        config (dict, optional): Diccionario de configuración de estilos.
+                                Si es None, usa DEFAULT_THEME.
+    
+    Example:
+        >>> from assets.styles import apply_custom_css_torneo_sets, DEMO_THEME
+        >>> apply_custom_css_torneo_sets(DEMO_THEME)
+    """
     if config is None:
         config = DEFAULT_THEME
     
+    # Determinar si necesitamos importar fuentes
     google_fonts_import = ""
     if "'Anton'" in config['font_title'] or "'Antonio'" in config['font_labels']:
         google_fonts_import = "@import url('https://fonts.googleapis.com/css2?family=Anton&family=Antonio:wght@100;200;300;400;500;600;700&display=swap');"
     
     css = f"""
     <style>
+        /* Importar fuentes si es necesario */
         {google_fonts_import}
         
         .main-title {{
@@ -880,34 +892,28 @@ def apply_custom_css_torneo_sets(config=None):
             box-shadow: {config['match_card_simple_shadow']};
         }}
 
-        /* --- FIX PARA NOMBRES DE PAREJAS (LABELS) --- */
-        
-        /* Contenedor de la etiqueta: forzamos que ocupe todo el ancho sin flex */
+        /* Force visibility on ALL label wrappers used by Streamlit */
         div[data-testid="stWidgetLabel"] {{
-            display: block !important;
-            width: 100% !important;
             opacity: 1 !important;
+            display: flex !important;
+            justify-content: center !important;
         }}
 
-        /* Texto de la etiqueta (el nombre de la pareja) */
+        /* Target the actual text inside the label */
         div[data-testid="stWidgetLabel"] p {{
             color: {config['text_dark']} !important;
             font-weight: {config['font_weight_labels']} !important;
             font-size: 14px !important;
             opacity: 1 !important;
-            display: block !important;
-            text-align: center !important;
-            margin-bottom: 0px !important;
-            -webkit-text-fill-color: {config['text_dark']} !important;
+            -webkit-text-fill-color: {config['text_dark']} !important; /* Forces color in some browsers */
         }}
 
-        /* Aseguramos visibilidad en el componente de número específicamente */
+        /* Fix for small screens/columns online */
         .stNumberInput label {{
             display: block !important;
             visibility: visible !important;
+            text-align: center !important;
         }}
-
-        /* --- INPUTS Y BOTONES --- */
 
         .stNumberInput input {{
             background-color: {config['number_input_bg']} !important;
@@ -915,7 +921,6 @@ def apply_custom_css_torneo_sets(config=None):
             font-weight: {config['font_weight_number_input']} !important;
             border-radius: {config['number_input_border_radius']} !important;
             border: none !important;
-            text-align: center;
         }}
 
         .stNumberInput button {{
@@ -945,10 +950,25 @@ def apply_custom_css_torneo_sets(config=None):
             margin-bottom: {config['match_title_margin_bottom']};
         }}
         
+        .final-title {{
+            font-weight: {config['font_weight_final_title']};
+            font-size: {config['final_title_size']};
+            color: {config['text_light']};
+            margin-bottom: {config['match_title_margin_bottom']};
+            text-align: center;
+        }}
+        
         .team-name {{
             font-weight: {config['font_weight_team_name']};
             color: {config['text_dark']};
             font-size: {config['team_name_size']};
+            text-align: center;
+        }}
+        
+        .final-team-name {{
+            font-weight: {config['font_weight_final_team_name']};
+            color: {config['text_light']};
+            font-size: {config['final_team_name_size']};
             text-align: center;
         }}
         
@@ -959,6 +979,20 @@ def apply_custom_css_torneo_sets(config=None):
             text-align: center;
             margin-top: {config['vs_margin_top']};
             margin-bottom: {config['vs_margin_bottom']};
+        }}
+        
+        .final-vs {{
+            font-weight: {config['font_weight_vs']};
+            font-size: {config['final_vs_size']};
+            color: {config['final_vs_color']};
+            text-align: center;
+            margin-top: {config['final_vs_margin_top']};
+            margin-bottom: {config['final_vs_margin_bottom']};
+        }}
+        
+        div[data-testid="stForm"] div.stNumberInput input {{
+            text-align: center;
+            font-weight: {config['font_weight_number_input']};
         }}
         
         .stButton button {{
@@ -972,11 +1006,22 @@ def apply_custom_css_torneo_sets(config=None):
             margin-top: {config['button_margin_top']};
         }}
 
-        .stButton, div[data-testid="column"] .stButton, div[data-testid="column"] .stButton button {{
-            width: 100% !important;
+        /* Ensure button container also takes full width */
+        .stButton {{
+            width: 100%;
+        }}
+
+        /* For buttons inside columns */
+        div[data-testid="column"] .stButton {{
+            width: 100%;
+        }}
+
+        div[data-testid="column"] .stButton button {{
+            width: 100%;
         }}
     </style>
     """
+    
     st.markdown(css, unsafe_allow_html=True)
 
 # components/ranking_display.py
