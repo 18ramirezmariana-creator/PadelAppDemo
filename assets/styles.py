@@ -892,6 +892,26 @@ def apply_custom_css_torneo_sets(config=None):
             box-shadow: {config['match_card_simple_shadow']};
         }}
 
+        /* 1. Estilo para el texto del label (Nombre de la pareja) */
+        div[data-testid="stWidgetLabel"] p {{
+            color: {config['text_dark']} !important;
+            font-weight: {config['font_weight_labels']} !important;
+            font-size: 14px !important; /* Puedes usar config['team_name_size'] si prefieres */
+            text-align: center !important;
+            margin-bottom: 0px !important;
+        }}
+
+        /* 2. Centrar el contenedor del label sobre el input */
+        div[data-testid="stWidgetLabel"] {{
+            justify-content: center !important;
+            display: flex !important;
+        }}
+        
+        /* 3. Ajuste para que el label no se oculte en columnas pequeñas */
+        .stNumberInput {{
+            width: 100% !important;
+        }}
+
         .stNumberInput input {{
             background-color: {config['number_input_bg']} !important;
             color: {config['text_light']} !important;

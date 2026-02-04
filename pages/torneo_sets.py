@@ -84,20 +84,7 @@ def app():
             
     # --- Estilos CSS (Se mantienen sin cambios) ---
     apply_custom_css_torneo_sets(DEMO_THEME)
-    st.markdown(f"""
-        <style>
-        div[data-testid="stWidgetLabel"] p {{
-            color: {DEMO_THEME['text_dark']} !important;
-            font-weight: {DEMO_THEME['font_weight_labels']} !important;
-            font-size: 14px !important;
-            text-align: center !important;
-        }}
-        div[data-testid="stWidgetLabel"] {{
-            justify-content: center !important;
-            display: flex !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
+    
     
     # ----------------------------------------------------------------------
     # FASE DE GRUPOS (FIXTURE)
@@ -132,7 +119,7 @@ def app():
 
                 with colA:
                     st.number_input(
-                        f"Games {p1}", 
+                        f"{p1}", 
                         key=score1_key, 
                         min_value=0, 
                         value=saved_s1, # Usa el valor guardado
@@ -142,7 +129,7 @@ def app():
                     )
                 with colB:
                     st.number_input(
-                        f"Games {p2}", 
+                        f"{p2}", 
                         key=score2_key, 
                         min_value=0, 
                         value=saved_s2, # Usa el valor guardado
