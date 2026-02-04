@@ -892,24 +892,27 @@ def apply_custom_css_torneo_sets(config=None):
             box-shadow: {config['match_card_simple_shadow']};
         }}
 
-        /* 1. Estilo para el texto del label (Nombre de la pareja) */
+        /* Force visibility on ALL label wrappers used by Streamlit */
+        div[data-testid="stWidgetLabel"] {{
+            opacity: 1 !important;
+            display: flex !important;
+            justify-content: center !important;
+        }}
+
+        /* Target the actual text inside the label */
         div[data-testid="stWidgetLabel"] p {{
             color: {config['text_dark']} !important;
             font-weight: {config['font_weight_labels']} !important;
-            font-size: 14px !important; /* Puedes usar config['team_name_size'] si prefieres */
-            text-align: center !important;
-            margin-bottom: 0px !important;
+            font-size: 14px !important;
+            opacity: 1 !important;
+            -webkit-text-fill-color: {config['text_dark']} !important; /* Forces color in some browsers */
         }}
 
-        /* 2. Centrar el contenedor del label sobre el input */
-        div[data-testid="stWidgetLabel"] {{
-            justify-content: center !important;
-            display: flex !important;
-        }}
-        
-        /* 3. Ajuste para que el label no se oculte en columnas pequeñas */
-        .stNumberInput {{
-            width: 100% !important;
+        /* Fix for small screens/columns online */
+        .stNumberInput label {{
+            display: block !important;
+            visibility: visible !important;
+            text-align: center !important;
         }}
 
         .stNumberInput input {{
