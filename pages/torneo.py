@@ -19,19 +19,30 @@ def app():
     # load from local storage on first run
     if "data_loaded_from_storage" not in st.session_state:
         saved_data = load_from_localstorage()
+        if saved_data is None:
+            st.spinner("Reconectando con la base de datos local...")
+            st.stop()
 
         if saved_data:
             st.session_state.fixture = saved_data.get("fixture", [])
             st.session_state.resultados = saved_data.get("resultados", {})
             st.session_state.code_play = saved_data.get("code_play", "")
             st.session_state.tournament_key = saved_data.get("tournament_key", "")
-
-            if "parejas" in saved_data:
-                st.session_state.parejas = saved_data["parejas"]
-            if "out" in saved_data:
-                st.session_state.out = saved_data["out"]
-            st.success("✅ Torneo restaurado desde la última conexión" )
-        st.session_state.data_loaded_from_storage = True
+            if "parejas" in saved_data: st.session_state.parejas = saved_data["parejas"]
+            if "out" in saved_data: st.session_state.out = saved_data["out"]
+            # Sincronizamos los resultados recuperados con las keys de los widgets
+            if st.session_state.resultados:
+                for (p1, p2), (s1, s2) in st.session_state.resultados.items():
+                    # Para Parejas Fijas (usando tu formato de key: p1_vs_p2_p1)
+                    k1_f = f"{p1}_vs_{p2}_p1"
+                    k2_f = f"{p1}_vs_{p2}_p2"
+                    st.session_state[k1_f] = s1
+                    st.session_state[k2_f] = s2
+            st.session_state.data_loaded_from_storage = True
+            st.rerun() # Crucial para que todo el código vea los datos cargados
+        else:
+            # No hay nada guardado, procedemos normal
+            st.session_state.data_loaded_from_storage = True
     #helper func to save current state to localstorage
     def save_current_state():
         data_to_save = {
@@ -124,7 +135,9 @@ def app():
                             
                             # Recuperar resultados usando los nombres de los equipos
                             saved_s1, saved_s2 = st.session_state.resultados.get((p1_equipo_str, p2_equipo_str), (0, 0))
-
+                            # Forzar que el session_state del widget tenga el valor correcto antes de renderizar
+                            if k1 not in st.session_state: st.session_state[k1] = saved_s1
+                            if k2 not in st.session_state: st.session_state[k2] = saved_s2
                             colA, colB = st.columns(2)
                             with colA:
                                 # Etiqueta de input con el nombre del equipo
@@ -227,13 +240,15 @@ def app():
 
                         key_p1 = f"score_r{ronda_data['ronda']}_m{c_i}_{raw_p1}_p1"
                         key_p2 = f"score_r{ronda_data['ronda']}_m{c_i}_{raw_p2}_p2"
+                        
 
                         # --- CAMBIO: Recuperar valores guardados si existen ---
                         pareja1_str = " & ".join(partido["pareja1"])
                         pareja2_str = " & ".join(partido["pareja2"])
                         # Buscamos si ya hay un resultado guardado para este partido
                         saved_s1, saved_s2 = st.session_state.resultados.get((pareja1_str, pareja2_str), (0, 0))
-
+                        if key_p1 not in st.session_state: st.session_state[key_p1] = saved_s1
+                        if key_p2 not in st.session_state: st.session_state[key_p2] = saved_s2
                         colA, colB = st.columns(2)
                         with colA:
                             st.number_input(

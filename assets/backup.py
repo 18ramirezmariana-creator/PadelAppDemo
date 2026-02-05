@@ -13,8 +13,16 @@ def _generate_key(operation):
 
 def save_to_localstorage(data):
     """Save tournament data to browser localStorage"""
+    # 1. Copia profunda para no modificar el session_state original accidentalmente
+    import copy
+    temp_data = copy.deepcopy(data)
+    
+    if 'resultados' in temp_data:
+        # Convertimos tuplas (p1, p2) en "p1|p2"
+        temp_data['resultados'] = {f"{k[0]}|{k[1]}": v for k, v in temp_data['resultados'].items()}
+    
     try:
-        json_data = json.dumps(data)
+        json_data = json.dumps(temp_data)
         json_data_escaped = json_data.replace('\\', '\\\\').replace("'", "\\'")
         
         js_code = f"""
@@ -22,7 +30,9 @@ def save_to_localstorage(data):
         localStorage.setItem('{HAS_SAVED_FLAG_KEY}', 'true');
         return true;
         """
-        st_javascript(js_code, key=f"save_{_generate_key('save')}")
+        # Aquí sí podemos usar key dinámica si queremos forzar el guardado, 
+        # pero para ahorrar recursos, una fija con timestamp sirve:
+        st_javascript(js_code, key=f"save_action_{int(time.time())}")
         return True
     except Exception as e:
         print(f"Error saving to localStorage: {e}")
@@ -31,18 +41,22 @@ def save_to_localstorage(data):
 def load_from_localstorage():
     """Load tournament data from browser localStorage"""
     try:
-        js_code = f"""
-        localStorage.getItem('{STORAGE_KEY}');
-        """
-        result = st_javascript(js_code, key=f"load_{_generate_key('load')}")
+        js_code = f"localStorage.getItem('{STORAGE_KEY}');"
         
-        if result and result != "null" and result != "undefined":
-            return json.loads(result)
+        # IMPORTANTE: La key "loader_estatico" debe ser fija.
+        result = st_javascript(js_code, key="loader_estatico")
+        
+        if result and result != "null" and isinstance(result, str):
+            data = json.loads(result)
+            if 'resultados' in data:
+                # Reconvertimos "p1|p2" a la tupla (p1, p2)
+                # y aseguramos que los scores sean una lista/tupla de enteros
+                data['resultados'] = {tuple(k.split('|')): v for k, v in data['resultados'].items()}
+            return data
         return None
     except Exception as e:
         print(f"Error loading from localStorage: {e}")
         return None
-
 def has_saved_tournament():
     """Check if there's a saved tournament (faster than loading all data)"""
     try:
