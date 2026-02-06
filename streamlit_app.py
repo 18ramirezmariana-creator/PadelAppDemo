@@ -22,8 +22,8 @@ if 'has_saved_tournament' not in st.session_state:
     st.session_state.has_saved_tournament = has_saved
 
 
-#if not check_login():
-#    st.stop()
+if not check_login():
+    st.stop()
 
 #🔥 CARGAR DATOS SOLO DESPUÉS DEL LOGIN EXITOSO
 if 'saved_data' not in st.session_state and st.session_state.get('has_saved_tournament', False):
