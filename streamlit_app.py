@@ -29,10 +29,33 @@ if 'has_saved_tournament' not in st.session_state:
 if 'saved_data' not in st.session_state and st.session_state.get('has_saved_tournament', False):
     saved_data = load_from_localstorage()
     if saved_data:
-        st.session_state.saved_data = saved_data
-    else:
-        # Si no hay datos pero la flag está activa, limpiar la flag
-        st.session_state.has_saved_tournament = False
+        st.session_state.num_fields = saved_data.get('num_fields', 2)
+        st.session_state.num_pts = saved_data.get('num_pts', 16)
+        st.session_state.mod = saved_data.get('mod', 'Parejas Fijas')
+        st.session_state.players = saved_data.get('players', [])
+        st.session_state.num_players = len(st.session_state.players)
+        # Restaurar datos del torneo
+        st.session_state.fixture = saved_data.get('fixture', [])
+        st.session_state.resultados = saved_data.get('resultados', {})
+        st.session_state.code_play = saved_data.get('code_play', '')
+        st.session_state.tournament_key = saved_data.get('tournament_key', '')
+         # Restaurar datos específicos del modo
+        if 'parejas' in saved_data:
+            st.session_state.parejas = saved_data['parejas']
+        if 'out' in saved_data:
+            st.session_state.out = saved_data['out']
+        if 'mixto_op' in saved_data:
+            st.session_state.mixto_op = saved_data['mixto_op']
+        if 'num_sets' in saved_data:
+            st.session_state.num_sets = saved_data['num_sets']
+            # 🎯 IR DIRECTAMENTE A LA PÁGINA DEL TORNEO
+        st.session_state.page = "torneo"
+        st.session_state.data_loaded_from_storage = True
+    st.session_state.checked_localstorage = True
+
+
+#if not check_login():
+#    st.stop()
 
 # Cargar la lista de páginas desde la carpeta "pages"
 pages_list = ["home"] + [f.replace(".py", "") for f in os.listdir("pages") if f.endswith(".py")]
