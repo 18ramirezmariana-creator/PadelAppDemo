@@ -37,7 +37,7 @@ def app():
             if 'num_sets' in saved_data:
                 st.session_state.num_sets = saved_data['num_sets']
             
-            st.warning("⚠️ Sesión restaurada automáticamente después de reconexión")
+            st.success("✅ Sesión restaurada automáticamente después de reconexión")
         else:
             # No saved data and no session data - go back to home
             st.error("❌ No hay datos de torneo. Por favor configura uno nuevo.")

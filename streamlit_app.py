@@ -15,8 +15,8 @@ hide_streamlit_style = """
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# 🔥 CHECK LOCALSTORAGE ON EVERY PAGE LOAD (NOT JUST ONCE)
-# This allows recovery after reconnection
+# 🔥 CHECK SESSION STATE FOR SAVED TOURNAMENT
+# Con la nueva implementación, los datos están en session_state._tournament_data
 saved_data = load_from_localstorage()
 
 if saved_data and isinstance(saved_data, dict):
