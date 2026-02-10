@@ -16,22 +16,10 @@ def app():
     puntos_partido =st.session_state.num_pts
     to_init = {"code_play": "", "ranking":""}
     initialize_vars(to_init)
-    # load from local storage on first run
-    if "data_loaded_from_storage" not in st.session_state:
-        saved_data = load_from_localstorage()
-
-        if saved_data:
-            st.session_state.fixture = saved_data.get("fixture", [])
-            st.session_state.resultados = saved_data.get("resultados", {})
-            st.session_state.code_play = saved_data.get("code_play", "")
-            st.session_state.tournament_key = saved_data.get("tournament_key", "")
-
-            if "parejas" in saved_data:
-                st.session_state.parejas = saved_data["parejas"]
-            if "out" in saved_data:
-                st.session_state.out = saved_data["out"]
-            st.success("✅ Torneo restaurado desde la última conexión" )
-        st.session_state.data_loaded_from_storage = True
+     # 🔥 SHOW RESTORATION MESSAGE IF TOURNAMENT WAS JUST RESTORED
+    if st.session_state.get('tournament_restored', False):
+        st.success("✅ Torneo restaurado desde la última sesión")
+        st.session_state.tournament_restored = False  # Clear flag after showing message
     #helper func to save current state to localstorage
     def save_current_state():
         data_to_save = {
@@ -41,14 +29,19 @@ def app():
             'tournament_key': st.session_state.get("tournament_key", ""),
             'mod':st.session_state.mod,
             'num_fields':st.session_state.num_fields,
-            'num_pts':st.session_state.num_pts
+            'num_pts':st.session_state.num_pts,
+            'players': st.session_state.players,
         }
         if st.session_state.mod == "Parejas Fijas":
             data_to_save['parejas'] = st.session_state.get("parejas", [])
+            if 'num_sets' in st.session_state:
+                data_to_save['num_sets'] = st.session_state.num_sets
         elif st.session_state.mod == "Todos Contra Todos":
             data_to_save['out'] = st.session_state.get("out", {})
+            if 'mixto_op' in st.session_state:
+                data_to_save['mixto_op'] = st.session_state.mixto_op
+    
         save_to_localstorage(data_to_save)
-
     # Función Callback para actualizar inmediatamente
     def actualizar_resultado(p1_str, p2_str, k1, k2):
         # Leemos el valor actual de los inputs usando sus keys

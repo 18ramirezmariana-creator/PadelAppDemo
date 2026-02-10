@@ -4,3 +4,4 @@ seaborn
 matplotlib
 bcrypt
 streamlit_javascript
+streamlit-js-eval
