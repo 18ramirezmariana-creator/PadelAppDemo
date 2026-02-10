@@ -12,6 +12,40 @@ import itertools,random
 import numpy as np
 
 def app():
+     # 🔥 CRITICAL: Protect against session reset
+    # If we don't have basic tournament data, try to restore from localStorage
+    if 'num_fields' not in st.session_state or 'players' not in st.session_state:
+        saved_data = load_from_localstorage()
+        if saved_data and isinstance(saved_data, dict):
+            # Emergency restore
+            st.session_state.num_fields = saved_data.get('num_fields', 2)
+            st.session_state.num_pts = saved_data.get('num_pts', 16)
+            st.session_state.mod = saved_data.get('mod', 'Parejas Fijas')
+            st.session_state.players = saved_data.get('players', [])
+            st.session_state.num_players = len(st.session_state.players)
+            st.session_state.fixture = saved_data.get('fixture', [])
+            st.session_state.resultados = saved_data.get('resultados', {})
+            st.session_state.code_play = saved_data.get('code_play', '')
+            st.session_state.tournament_key = saved_data.get('tournament_key', '')
+            
+            if 'parejas' in saved_data:
+                st.session_state.parejas = saved_data['parejas']
+            if 'out' in saved_data:
+                st.session_state.out = saved_data['out']
+            if 'mixto_op' in saved_data:
+                st.session_state.mixto_op = saved_data['mixto_op']
+            if 'num_sets' in saved_data:
+                st.session_state.num_sets = saved_data['num_sets']
+            
+            st.warning("⚠️ Sesión restaurada automáticamente después de reconexión")
+        else:
+            # No saved data and no session data - go back to home
+            st.error("❌ No hay datos de torneo. Por favor configura uno nuevo.")
+            if st.button("Ir a Inicio"):
+                st.session_state.page = "home"
+                st.rerun()
+            st.stop()
+
     num_canchas = st.session_state.num_fields
     puntos_partido =st.session_state.num_pts
     to_init = {"code_play": "", "ranking":""}
@@ -22,26 +56,34 @@ def app():
         st.session_state.tournament_restored = False  # Clear flag after showing message
     #helper func to save current state to localstorage
     def save_current_state():
-        data_to_save = {
-            'fixture': st.session_state.get("fixture", []),
-            'resultados': st.session_state.get("resultados", {}),
-            'code_play': st.session_state.get("code_play", ""),
-            'tournament_key': st.session_state.get("tournament_key", ""),
-            'mod':st.session_state.mod,
-            'num_fields':st.session_state.num_fields,
-            'num_pts':st.session_state.num_pts,
-            'players': st.session_state.players,
-        }
-        if st.session_state.mod == "Parejas Fijas":
-            data_to_save['parejas'] = st.session_state.get("parejas", [])
-            if 'num_sets' in st.session_state:
-                data_to_save['num_sets'] = st.session_state.num_sets
-        elif st.session_state.mod == "Todos Contra Todos":
-            data_to_save['out'] = st.session_state.get("out", {})
-            if 'mixto_op' in st.session_state:
-                data_to_save['mixto_op'] = st.session_state.mixto_op
-    
-        save_to_localstorage(data_to_save)
+        """Save tournament state to browser localStorage with error handling"""
+        try:
+            data_to_save = {
+                'fixture': st.session_state.get("fixture", []),
+                'resultados': st.session_state.get("resultados", {}),
+                'code_play': st.session_state.get("code_play", ""),
+                'tournament_key': st.session_state.get("tournament_key", ""),
+                'mod': st.session_state.mod,
+                'num_fields': st.session_state.num_fields,
+                'num_pts': st.session_state.num_pts,
+                'players': st.session_state.players,
+                'num_players': len(st.session_state.players),  # ADD THIS
+            }
+            if st.session_state.mod == "Parejas Fijas":
+                data_to_save['parejas'] = st.session_state.get("parejas", [])
+                if 'num_sets' in st.session_state:
+                    data_to_save['num_sets'] = st.session_state.num_sets
+            elif st.session_state.mod == "Todos Contra Todos":
+                data_to_save['out'] = st.session_state.get("out", {})
+                if 'mixto_op' in st.session_state:
+                    data_to_save['mixto_op'] = st.session_state.mixto_op
+            
+            # Save to localStorage
+            success = save_to_localstorage(data_to_save)
+            if not success:
+                print("Warning: Failed to save to localStorage")
+        except Exception as e:
+            print(f"Error in save_current_state: {e}")
     # Función Callback para actualizar inmediatamente
     def actualizar_resultado(p1_str, p2_str, k1, k2):
         # Leemos el valor actual de los inputs usando sus keys

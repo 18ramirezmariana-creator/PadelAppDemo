@@ -15,19 +15,16 @@ hide_streamlit_style = """
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# 🔥 CHECK LOCALSTORAGE ONLY ONCE PER SESSION
-if 'checked_localstorage' not in st.session_state:
-    st.session_state.checked_localstorage = True
-    
-    # Try to load saved tournament
-    saved_data = load_from_localstorage()
-    
-    if saved_data and isinstance(saved_data, dict):
-        # Store that we found saved data (don't auto-restore yet)
-        st.session_state.has_saved_tournament = True
-        st.session_state.saved_tournament_data = saved_data
-    else:
-        st.session_state.has_saved_tournament = False
+# 🔥 CHECK LOCALSTORAGE ON EVERY PAGE LOAD (NOT JUST ONCE)
+# This allows recovery after reconnection
+saved_data = load_from_localstorage()
+
+if saved_data and isinstance(saved_data, dict):
+    # Store that we found saved data
+    st.session_state.has_saved_tournament = True
+    st.session_state.saved_tournament_data = saved_data
+else:
+    st.session_state.has_saved_tournament = False
 
 
 #if not check_login():
