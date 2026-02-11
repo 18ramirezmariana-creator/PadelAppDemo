@@ -12,107 +12,70 @@ import itertools,random
 import numpy as np
 
 def app():
-     # 🔥 CRITICAL: Protect against session reset
-    # If we don't have basic tournament data, try to restore from localStorage
-    if 'num_fields' not in st.session_state or 'players' not in st.session_state:
-        saved_data = load_from_localstorage()
-        if saved_data and isinstance(saved_data, dict):
-            # Emergency restore
-            st.session_state.num_fields = saved_data.get('num_fields', 2)
-            st.session_state.num_pts = saved_data.get('num_pts', 16)
-            st.session_state.mod = saved_data.get('mod', 'Parejas Fijas')
-            st.session_state.players = saved_data.get('players', [])
-            st.session_state.num_players = len(st.session_state.players)
-            st.session_state.fixture = saved_data.get('fixture', [])
-            st.session_state.resultados = saved_data.get('resultados', {})
-            st.session_state.code_play = saved_data.get('code_play', '')
-            st.session_state.tournament_key = saved_data.get('tournament_key', '')
-            
-            if 'parejas' in saved_data:
-                st.session_state.parejas = saved_data['parejas']
-            if 'out' in saved_data:
-                st.session_state.out = saved_data['out']
-            if 'mixto_op' in saved_data:
-                st.session_state.mixto_op = saved_data['mixto_op']
-            if 'num_sets' in saved_data:
-                st.session_state.num_sets = saved_data['num_sets']
-            
-            st.success("✅ Sesión restaurada automáticamente después de reconexión")
-        else:
-            # No saved data and no session data - go back to home
-            st.error("❌ No hay datos de torneo. Por favor configura uno nuevo.")
-            if st.button("Ir a Inicio"):
-                st.session_state.page = "home"
-                st.rerun()
-            st.stop()
+    # --- 1. VERIFICACIÓN DE SEGURIDAD ---
+    # Si por algún motivo llegamos aquí sin jugadores (y el main no pudo restaurar), volvemos al home
+    if 'players' not in st.session_state:
+        st.warning("⚠️ No se encontraron datos activos. Volviendo al inicio...")
+        st.query_params["p"] = "home"
+        st.session_state.page = "home"
+        st.rerun()
 
+    # --- 2. CONFIGURACIÓN INICIAL ---
     num_canchas = st.session_state.num_fields
-    puntos_partido =st.session_state.num_pts
-    to_init = {"code_play": "", "ranking":""}
-    initialize_vars(to_init)
-     # 🔥 SHOW RESTORATION MESSAGE IF TOURNAMENT WAS JUST RESTORED
+    puntos_partido = st.session_state.num_pts
+    initialize_vars({"code_play": "", "ranking": "","parejas": []})
+
     if st.session_state.get('tournament_restored', False):
-        st.success("✅ Torneo restaurado desde la última sesión")
-        st.session_state.tournament_restored = False  # Clear flag after showing message
-    #helper func to save current state to localstorage
+        st.toast("✅ Datos restaurados correctamente", icon="🔄")
+        st.session_state.tournament_restored = False
+    # --- 3. FUNCIONES DE PERSISTENCIA ---
     def save_current_state():
-        """Save tournament state to browser localStorage with error handling"""
-        try:
-            data_to_save = {
-                'fixture': st.session_state.get("fixture", []),
-                'resultados': st.session_state.get("resultados", {}),
-                'code_play': st.session_state.get("code_play", ""),
-                'tournament_key': st.session_state.get("tournament_key", ""),
-                'mod': st.session_state.mod,
-                'num_fields': st.session_state.num_fields,
-                'num_pts': st.session_state.num_pts,
-                'players': st.session_state.players,
-                'num_players': len(st.session_state.players),  # ADD THIS
-            }
-            if st.session_state.mod == "Parejas Fijas":
-                data_to_save['parejas'] = st.session_state.get("parejas", [])
-                if 'num_sets' in st.session_state:
-                    data_to_save['num_sets'] = st.session_state.num_sets
-            elif st.session_state.mod == "Todos Contra Todos":
-                data_to_save['out'] = st.session_state.get("out", {})
-                if 'mixto_op' in st.session_state:
-                    data_to_save['mixto_op'] = st.session_state.mixto_op
+        """Guarda el estado actual en el navegador"""
+        data_to_save = {
+            'fixture': st.session_state.get("fixture", []),
+            'resultados': st.session_state.get("resultados", {}),
+            'mod': st.session_state.mod,
+            'num_fields': st.session_state.num_fields,
+            'num_pts': st.session_state.num_pts,
+            'players': st.session_state.players,
+            'num_players': len(st.session_state.players),
+            'tournament_key': st.session_state.get("tournament_key", ""),
+            'code_play': st.session_state.get("code_play", "")
+        }
+        # Añadir datos específicos según modalidad
+        if st.session_state.mod == "Parejas Fijas":
+            data_to_save['parejas'] = st.session_state.get("parejas", [])
+        else:
+            data_to_save['out'] = st.session_state.get("out", {})
             
-            # Save to localStorage
-            success = save_to_localstorage(data_to_save)
-            if not success:
-                print("Warning: Failed to save to localStorage")
-        except Exception as e:
-            print(f"Error in save_current_state: {e}")
+        save_to_localstorage(data_to_save)
     # Función Callback para actualizar inmediatamente
     def actualizar_resultado(p1_str, p2_str, k1, k2):
-        # Leemos el valor actual de los inputs usando sus keys
+        """Callback que se dispara al cambiar cualquier score"""
         val1 = st.session_state[k1]
         val2 = st.session_state[k2]
-        # Guardamos inmediatamente en el diccionario de resultados
         st.session_state.resultados[(p1_str, p2_str)] = (val1, val2)
-        # Guardar el estado actual en localStorage
-        save_current_state()
+        save_current_state() # Guardado inmediato al disco del navegador
     
     #divission logica parejas fijas vs aleatorias
+    # --- 4. LÓGICA DE MODALIDADES ---
     mod_parejas = st.session_state.mod
+    apply_custom_css_torneo(DEMO_THEME)
+
     if mod_parejas == "Parejas Fijas":
         st.markdown('<div class="main-title"> Torneo Americano - Parejas Fijas </div>', unsafe_allow_html=True)
-        parejas = st.session_state.players
         
-        # AUTO-GENERATE fixture on first load
-        tournament_key = f"parejas_fijas_{len(parejas)}_{num_canchas}_{puntos_partido}"
-        if 'tournament_key' not in st.session_state or st.session_state.tournament_key != tournament_key:
-            with st.spinner("Generando fixture..."):
-                generator = FixedPairsTournament(parejas, num_canchas)
-                resultados_torneo = generator.generate_schedule()
-                st.session_state.fixture = resultados_torneo["rondas"]
-                st.session_state.code_play = "parejas_fijas"
-                st.session_state.resultados = {}
-                st.session_state.parejas = parejas
-                st.session_state.tournament_key = tournament_key
-                #save initial fixture to local storage
-                save_current_state()
+        # Generar fixture solo si no existe o es un torneo nuevo
+        tk = f"pf_{len(st.session_state.players)}_{num_canchas}"
+        if st.session_state.get('tournament_key') != tk and 'fixture' not in st.session_state:
+            generator = FixedPairsTournament(st.session_state.players, num_canchas)
+            out = generator.generate_schedule()
+            st.session_state.fixture = out["rondas"]
+            st.session_state.tournament_key = tk
+            st.session_state.resultados = {}
+            st.session_state.code_play = "parejas_fijas"
+            save_current_state()
+
         if st.session_state.code_play == "parejas_fijas" :
             apply_custom_css_torneo(DEMO_THEME)
             for i, ronda in enumerate(st.session_state.fixture, start=1):
@@ -189,36 +152,26 @@ def app():
                     st.info(f"Descansan en Ronda {i}: {', '.join(parejas_descansando)}")
             # --- Ranking Final ---            
             if st.button("¿Cómo va el ranking? 👀", key="ranking_parejas",use_container_width=True):
-                ranking = calcular_ranking_parejas(st.session_state.parejas, st.session_state.resultados)
+                ranking = calcular_ranking_parejas(st.session_state.players, st.session_state.resultados)
                 st.session_state.ranking = ranking
                 display_ranking_table(ranking, ranking_type="parejas")
 
 
     elif mod_parejas == "Todos Contra Todos":
-        def generar_torneo_todos_contra_todos(jugadores, num_canchas, seed=None):
-            if seed:
-                random.seed(seed)
-            
+        st.markdown('<div class="main-title"> Torneo Americano </div>', unsafe_allow_html=True)
+        
+        tk = f"all_{len(st.session_state.players)}_{num_canchas}"
+        if st.session_state.get('tournament_key') != tk and 'fixture' not in st.session_state:
+            from models.AllvsAll_Random_modelv3 import AmericanoTournament
             tournament = AmericanoTournament(st.session_state.players, num_canchas)
             schedule, helpers = tournament.generate_tournament()
-            return tournament.format_for_streamlit(schedule, helpers)
-        
-        st.markdown('<div class="main-title"> Torneo Americano</div>', unsafe_allow_html=True)
-
-        
-        # AUTO-GENERATE fixture on first load (igual que en sets)
-        jugadores = st.session_state.players
-        tournament_key = f"todos_contra_todos_{len(jugadores)}_{num_canchas}_{puntos_partido}"
-        
-        if 'tournament_key' not in st.session_state or st.session_state.tournament_key != tournament_key:
-            with st.spinner("Generando fixture optimizado..."):
-                out = generar_torneo_todos_contra_todos(jugadores, num_canchas, seed=42)
-                st.session_state.code_play = "AllvsAll"
-                st.session_state.fixture = out["rondas"]
-                st.session_state.out = out
-                st.session_state.resultados = {}
-                st.session_state.tournament_key = tournament_key
-                save_current_state()
+            out = tournament.format_for_streamlit(schedule, helpers)
+            st.session_state.fixture = out["rondas"]
+            st.session_state.out = out
+            st.session_state.tournament_key = tk
+            st.session_state.resultados = {}
+            st.session_state.code_play = "AllvsAll"
+            save_current_state()
 
 
         # Visualización especial para Todos Contra Todos
@@ -307,28 +260,29 @@ def app():
             
 
     # --- Navegación inferior ---
+    st.divider()
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Volver y Reiniciar", key="back_button"):
             clear_localstorage()
-            # Limpiar datos del torneo al volver
-            if 'tournament_key' in st.session_state:
-                del st.session_state.tournament_key
-            if 'fixture' in st.session_state:
-                del st.session_state.fixture
-            if 'resultados' in st.session_state:
-                del st.session_state.resultados
-            if 'data_loaded_from_storage' in st.session_state:
-                del st.session_state.data_loaded_from_storage
-            st.session_state.page = "players_setup"
+            keys_to_clear = ['fixture', 'resultados', 'tournament_key', 'players', 'out']
+            for k in keys_to_clear:
+                if k in st.session_state: del st.session_state[k]
+            
+            st.query_params["p"] = "home" # Sincronizamos URL
+            st.session_state.page = "home"
             st.rerun()
     with col2:
-        if st.button("Ver Resultados Finales 🏆"):
+        if st.button("🏆 Ver Resultados Finales", type="primary", use_container_width=True):
+            # Calculamos ranking antes de irnos para asegurar que se guarde el último cambio
             if mod_parejas == "Parejas Fijas":
-                ranking = calcular_ranking_parejas(st.session_state.parejas, st.session_state.resultados)
-            elif mod_parejas == "Todos Contra Todos":
-                ranking = calcular_ranking_individual(st.session_state.resultados,st.session_state.fixture)
+                ranking = calcular_ranking_parejas(st.session_state.players, st.session_state.resultados)
+            else:
+                ranking = calcular_ranking_individual(st.session_state.resultados, st.session_state.fixture)
+            
             st.session_state.ranking = ranking
             save_current_state()
+            
+            st.query_params["p"] = "z_ranking" # Sincronizamos URL
             st.session_state.page = "z_ranking"
             st.rerun()
