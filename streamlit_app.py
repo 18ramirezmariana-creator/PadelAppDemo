@@ -120,12 +120,26 @@ def load_page(page_name):
             else:
                 st.session_state.num_pts = st.number_input("Número de puntos", value=16)
 
-        # Botón para iniciar
         if st.button("Continuar a Registro de Jugadores", key="btn_start", use_container_width=True):
             if can_continue:
-                clear_localstorage() # Limpiamos rastro de torneos viejos
+
+                # 🔥 LIMPIEZA TOTAL DEL TORNEO ANTERIOR
+                keys_to_clear = [
+                    "players",
+                    "rounds",
+                    "results",
+                    "matches",
+                    "tournament_restored"
+                ]
+
+                for k in keys_to_clear:
+                    if k in st.session_state:
+                        del st.session_state[k]
+
+                clear_localstorage()
+
                 target = "players_setupMixto" if mixto else "players_setup"
-                navigate_to(target) # <--- CAMBIO CLAVE: Usa navigate_to
+                navigate_to(target)
 
     else:
         # Carga dinámica de páginas en /pages
