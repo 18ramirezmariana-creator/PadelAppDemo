@@ -33,8 +33,11 @@ saved_data = load_from_browser()
 if "is_restoring_tournament" not in st.session_state:
     st.session_state.is_restoring_tournament = False
 
-if st.session_state.page != "home" and 'players' not in st.session_state:
-
+if (
+    st.session_state.page != "home"
+    and "players" not in st.session_state
+    and saved_data
+):
     st.session_state.is_restoring_tournament = True
     restored_data = saved_data
 
