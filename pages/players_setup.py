@@ -33,11 +33,13 @@ def app():
         card_label = "Elemento"
         num_cards = 0 
         
-    # Inicializar lista de jugadores
-    if "players" not in st.session_state:
+    # 🔥 FIX: Si venimos de un torneo nuevo, siempre reiniciar players
+    if st.session_state.get("starting_new_tournament", False):
+        st.session_state.players = [""] * num_cards
+        st.session_state.starting_new_tournament = False  # Consumir el flag
+    elif "players" not in st.session_state:
         st.session_state.players = [""] * num_cards
     else:
-        # Ajustar tamaño si el usuario volvió atrás y cambió el número de jugadores
         current_len = len(st.session_state.players)
         if current_len < num_cards:
             st.session_state.players += [""] * (num_cards - current_len)
