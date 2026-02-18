@@ -19,6 +19,15 @@ def app():
 
     num_players = st.session_state.num_players
     mod = st.session_state.get("mod", "Todos Contra Todos")
+     # 🔍 DIAGNÓSTICO TEMPORAL - borra esto después
+    st.write("DEBUG:", {
+        "mod": mod,
+        "num_players": num_players,
+        "num_cards calculado": num_players if mod == "Todos Contra Todos" else num_players // 2,
+        "starting_new_tournament": st.session_state.get("starting_new_tournament", "NO EXISTE"),
+        "players actuales": st.session_state.get("players", "NO EXISTE"),
+        "len(players)": len(st.session_state.get("players", [])),
+    })
     
     st.markdown('<div class="main-title">🏅 Registro de Jugadores</div>', unsafe_allow_html=True)
     
