@@ -36,7 +36,7 @@ if "is_restoring_tournament" not in st.session_state:
 if st.session_state.page != "home" and 'players' not in st.session_state:
 
     st.session_state.is_restoring_tournament = True
-    restored_data = load_from_browser()
+    restored_data = saved_data
 
     if restored_data:
         for key, value in restored_data.items():

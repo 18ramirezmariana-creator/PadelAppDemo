@@ -22,18 +22,18 @@ def save_to_localstorage(data):
         return False
 
 def load_from_browser():
-    """
-    LEE REALMENTE DEL NAVEGADOR.
-    Esta función es la que salva el torneo tras la caída de internet.
-    """
-    # Ejecutamos JS para obtener el valor
-    data_js = st_javascript("localStorage.getItem('padel_tournament');")
-    
-    if data_js and isinstance(data_js, str):
+    # Usar una key fija para evitar duplicados
+    data_js = st_javascript(
+        "localStorage.getItem('padel_tournament');",
+        key="load_padel_tournament"
+    )
+
+    if data_js:
         try:
             return json.loads(data_js)
-        except:
+        except Exception:
             return None
+
     return None
 
 def load_from_localstorage():
