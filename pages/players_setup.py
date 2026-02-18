@@ -9,6 +9,7 @@ def update_player_name(idx, key):
         pass
 
 def app():
+    st.write("DEBUG: Entramos a players_setup.py")  # Línea de diagnóstico
     # --- 1. VERIFICACIÓN DE SEGURIDAD ---
     # Si se pierde el session_state, intentamos recuperar num_players
     if "num_players" not in st.session_state:
