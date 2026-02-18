@@ -127,6 +127,11 @@ def load_page(page_name):
             if can_continue:
                 st.session_state.starting_new_tournament = True  # 🔥 FLAG CRÍTICO
 
+                # 🔥 FIX: Forzar valores actuales del formulario
+                st.session_state.mod = st.session_state.modalidad_input
+                st.session_state.num_players = st.session_state.select_players
+                st.session_state.num_fields = st.session_state.fields_input
+
                 keys_to_clear = [
                     "players",
                     "rounds",
