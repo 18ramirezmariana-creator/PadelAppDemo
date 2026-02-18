@@ -4,7 +4,7 @@ import os, importlib
 from assets.sidebar import sidebar_style
 from assets.styles import apply_custom_css_main, apply_custom_css_player_setup, DEMO_THEME
 from assets.helper_funcs import initialize_vars
-from assets.backup import load_from_localstorage, clear_localstorage, save_to_localstorage
+from assets.backup import load_from_localstorage, clear_localstorage, load_from_browser
 
 st.set_page_config(page_title=" Padel App", page_icon=":tennis:", layout="wide")
 
@@ -29,16 +29,32 @@ def navigate_to(page_name):
     st.rerun()
 
 # --- 3. GESTIÓN DE DATOS Y RECUPERACIÓN AUTOMÁTICA ---
-saved_data = load_from_localstorage()
+saved_data = load_from_browser()
+if "is_restoring_tournament" not in st.session_state:
+    st.session_state.is_restoring_tournament = False
 
-# Si la URL dice que estamos en una página interna pero la memoria RAM está vacía
-# intentamos inyectar los datos guardados automáticamente
-if saved_data and 'players' not in st.session_state and st.session_state.page != "home":
-    for key, value in saved_data.items():
-        st.session_state[key] = value
-    st.toast("🔄 Conexión restablecida: Datos recuperados")
+if st.session_state.page != "home" and 'players' not in st.session_state:
 
-st.session_state.has_saved_tournament = True if saved_data else False
+    st.session_state.is_restoring_tournament = True
+    restored_data = load_from_browser()
+
+    if restored_data:
+        for key, value in restored_data.items():
+            st.session_state[key] = value
+        
+        st.session_state.is_restoring_tournament = False
+        st.toast("🔄 Conexión restablecida: Datos recuperados")
+        st.rerun()
+    else:
+        st.session_state.is_restoring_tournament = False
+        st.session_state.page = "home"
+        st.query_params["p"] = "home"
+        st.rerun()
+# Evita ejecución parcial mientras restaura
+if st.session_state.get("is_restoring_tournament", False):
+    st.stop()
+
+st.session_state.has_saved_tournament = bool(saved_data)
 
 # --- 4. RENDERIZADO DE PÁGINAS ---
 def load_page(page_name):

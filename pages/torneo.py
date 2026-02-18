@@ -12,9 +12,13 @@ import itertools,random
 import numpy as np
 
 def app():
+    if st.session_state.get("is_restoring_tournament", False):
+        st.info("🔄 Restaurando torneo... por favor espera")
+        st.stop()
+
     # --- 1. VERIFICACIÓN DE SEGURIDAD ---
     # Si por algún motivo llegamos aquí sin jugadores (y el main no pudo restaurar), volvemos al home
-    if 'players' not in st.session_state:
+    if 'players' not in st.session_state and not st.session_state.get("is_restoring_tournament", False):
         st.warning("⚠️ No se encontraron datos activos. Volviendo al inicio...")
         st.query_params["p"] = "home"
         st.session_state.page = "home"
