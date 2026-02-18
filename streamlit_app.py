@@ -126,7 +126,8 @@ def load_page(page_name):
         if st.button("Continuar a Registro de Jugadores", key="btn_start", use_container_width=True):
             if can_continue:
 
-                # 🔥 LIMPIEZA TOTAL DEL TORNEO ANTERIOR
+                st.session_state.starting_new_tournament = True  # 🔥 FLAG CRÍTICO
+
                 keys_to_clear = [
                     "players",
                     "rounds",
@@ -143,6 +144,7 @@ def load_page(page_name):
 
                 target = "players_setupMixto" if mixto else "players_setup"
                 navigate_to(target)
+
 
     else:
         # Carga dinámica de páginas en /pages
