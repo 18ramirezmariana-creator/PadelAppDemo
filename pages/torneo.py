@@ -16,6 +16,9 @@ def app():
         st.info("🔄 Restaurando torneo... por favor espera")
         st.stop()
 
+    if "tournament_initialized" not in st.session_state:
+        st.session_state.tournament_initialized = False
+
     # --- 1. VERIFICACIÓN DE SEGURIDAD ---
     # Si por algún motivo llegamos aquí sin jugadores (y el main no pudo restaurar), volvemos al home
     if 'players' not in st.session_state and not st.session_state.get("is_restoring_tournament", False):
@@ -32,6 +35,7 @@ def app():
     if st.session_state.get('tournament_restored', False):
         st.toast("✅ Datos restaurados correctamente", icon="🔄")
         st.session_state.tournament_restored = False
+        st.session_state.tournament_initialized = True
     # --- 3. FUNCIONES DE PERSISTENCIA ---
     def save_current_state():
         """Guarda el estado actual en el navegador"""
@@ -55,11 +59,25 @@ def app():
         save_to_localstorage(data_to_save)
     # Función Callback para actualizar inmediatamente
     def actualizar_resultado(p1_str, p2_str, k1, k2):
-        """Callback que se dispara al cambiar cualquier score"""
+        # 🔒 NO permitir guardado si el torneo no está estable
+        if not st.session_state.get("tournament_initialized", False):
+            return
+
+        if "players" not in st.session_state:
+            return
+
+        if "fixture" not in st.session_state:
+            return
+
+        if "resultados" not in st.session_state:
+            return
+
         val1 = st.session_state[k1]
         val2 = st.session_state[k2]
+
         st.session_state.resultados[(p1_str, p2_str)] = (val1, val2)
-        save_current_state() # Guardado inmediato al disco del navegador
+
+        save_current_state()
     
     #divission logica parejas fijas vs aleatorias
     # --- 4. LÓGICA DE MODALIDADES ---
@@ -79,6 +97,7 @@ def app():
             st.session_state.resultados = {}
             st.session_state.code_play = "parejas_fijas"
             save_current_state()
+            st.session_state.tournament_initialized = True
 
         if st.session_state.code_play == "parejas_fijas" :
             apply_custom_css_torneo(DEMO_THEME)
@@ -176,6 +195,7 @@ def app():
             st.session_state.resultados = {}
             st.session_state.code_play = "AllvsAll"
             save_current_state()
+            st.session_state.tournament_initialized = True
 
 
         # Visualización especial para Todos Contra Todos
@@ -268,6 +288,7 @@ def app():
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Volver y Reiniciar", key="back_button"):
+            st.session_state.tournament_initialized = False
             clear_localstorage()
             keys_to_clear = ['fixture', 'resultados', 'tournament_key', 'players', 'out']
             for k in keys_to_clear:
